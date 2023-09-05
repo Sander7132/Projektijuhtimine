@@ -1,0 +1,21 @@
+{
+  "name": "recipebook",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon -e js,json,yml index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@gradeup/email-verify": "^0.2.4",
+    "bcrypt": "^5.1.0",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "nodemon": "^2.0.21",
+    "swagger-ui-express": "^4.6.2",
+    "yamljs": "^0.3.0"
+  }
+}
