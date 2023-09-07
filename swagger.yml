@@ -1,6 +1,6 @@
 openapi: 3.0.2
 info:
-  title: Recipebook
+  title: RecipeBook
   version: 1.0.0
 paths:
   /users:
@@ -14,19 +14,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/User"
+              $ref: '#/components/schemas/User'
         required: true
       tags:
         - /users
       responses:
-        "201":
+        '201':
           description: Successful response.
-        "400":
+        '400':
           content:
             text/html:
               examples:
-                "Invalid email: {reason}":
-                  value: "Invalid email: {reason}"
+                'Invalid email: {reason}':
+                  value: 'Invalid email: {reason}'
                 Email and password are required:
                   value: Email and password are required
                 Password must be at least 8 characters long:
@@ -34,7 +34,7 @@ paths:
                 Email must be in a valid format:
                   value: Email must be in a valid format
           description: Client side error
-        "409":
+        '409':
           content:
             text/html:
               examples:
@@ -55,32 +55,32 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Credentials"
+              $ref: '#/components/schemas/Credentials'
         required: true
       tags:
         - /sessions
       responses:
-        "201":
+        '201':
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Session"
+                $ref: '#/components/schemas/Session'
           description: Successful response.
-        "400":
+        '400':
           content:
             text/html:
               examples:
                 Email and password are required:
                   value: Email and password are required
           description: Bad Request
-        "401":
+        '401':
           content:
             text/html:
               examples:
                 Invalid password:
                   value: Invalid password
           description: Unauthorized
-        "404":
+        '404':
           content:
             text/html:
               examples:
@@ -89,21 +89,21 @@ paths:
           description: Not Found
       operationId: createSession
       summary: Create a Session
-      description: "Creates a new instance of a `Session`, signing the user in. Returns session ID."
+      description: 'Creates a new instance of a `Session`, signing the user in. Returns session ID.'
     delete:
       tags:
         - /sessions
       responses:
-        "204":
+        '204':
           description: Successful response.
-        "400":
+        '400':
           content:
             text/html:
               examples:
                 Invalid authorization header:
                   value: Invalid authorization header
           description: Bad Request
-        "401":
+        '401':
           content:
             text/html:
               examples:
@@ -113,21 +113,59 @@ paths:
                   value: Invalid session
           description: Unauthorized
       security:
-        - Bearer: []
+        - Bearer: [ ]
       summary: Destroy a Session
-      description: "Destroys a `Session`, signing the user out. Reads the session ID from Authorization header."
+      description: 'Destroys a `Session`, signing the user out. Reads the session ID from Authorization header.'
+  /recipes:
+    summary: Path used to manage the list of recipes.
+    description: >-
+      The REST endpoint/path used to list and create zero or more `Recipe` entities.  This path contains a
+      `GET` and `POST` operation to perform the list and create tasks, respectively.
+    get:
+      tags:
+        - /recipes
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recipe'
+          description: Successful response - returns an array of `Recipe` entities.
+        '400':
+          content:
+            text/html:
+              examples:
+                Invalid authorization header:
+                  value: Invalid authorization header
+          description: Bad Request
+        '401':
+          content:
+            text/html:
+              examples:
+                Missing authorization header:
+                  value: Missing authorization header
+                Invalid session:
+                  value: Invalid session
+          description: Unauthorized
+      security:
+        - Bearer: [ ]
+      operationId: getRecipes
+      summary: List All Recipes
+      description: Gets a list of all `Recipe` entities.
 components:
   schemas:
     User:
       title: Root Type for User
-      description: ""
+      description: ''
       type: object
       properties:
         id:
           format: int32
           description: A field that represents the unique identifier of the user.
           type: integer
-          example: "12345"
+          example: '12345'
         email:
           description: A field that represents the email address of the user.
           type: string
@@ -142,7 +180,7 @@ components:
         password: pass123
     Session:
       title: Root Type for Session
-      description: ""
+      description: ''
       type: object
       properties:
         id:
@@ -155,7 +193,7 @@ components:
         userId: 1
     Credentials:
       title: Root Type for Credentials
-      description: ""
+      description: ''
       type: object
       properties:
         email:
@@ -165,12 +203,34 @@ components:
       example:
         email: admin
         password: KollneKollne
+    Recipe:
+      title: Root Type for Recipe
+      description: ''
+      type: object
+      properties:
+        content:
+          type: string
+        id:
+          format: int32
+          type: integer
+        title:
+          type: string
+        userId:
+          format: int32
+          type: integer
+      example:
+        content: This is the content of recipe 1
+        id: 1
+        title: Recipe 1
+        userId: 1
   securitySchemes:
     Bearer:
       scheme: bearer
       type: http
 tags:
   - name: /users
-    description: ""
+    description: ''
   - name: /sessions
-    description: ""
+    description: ''
+  - name: /recipes
+    description: ''

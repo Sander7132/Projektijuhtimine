@@ -17,6 +17,27 @@
 	<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
 	<link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
 	<link rel="manifest" href="/icons/site.webmanifest">
+	<style>
+
+		#recipe-list {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+			grid-gap: 1rem;
+			grid-auto-rows: minmax(100px, auto);
+		}
+
+		.recipe-card {
+			background-color: #f8f9fa;
+			border: 1px solid #dee2e6;
+			border-radius: .25rem;
+			padding: 1rem;
+		}
+
+		.recipe-card:hover {
+			background-color: #e9ecef;
+		}
+
+	</style>
 </head>
 <body>
 
@@ -40,6 +61,16 @@
 				<button type="button" class="btn btn-primary" data-bs-toggle="modal" v-if="sessionId" @click="signOut">
 					Sign Out
 				</button>
+			</div>
+
+			&nbsp;
+
+			<!-- List of recipes -->
+			<div id="recipe-list">
+				<div v-for="recipe in recipes" class="recipe-card">
+					{{ recipe.title }}<br>
+					{{ recipe.content }}
+				</div>
 			</div>
 		</div>
 	</div>
@@ -129,15 +160,27 @@
 				signUpPassword: null,
 				signInEmail: null,
 				signInPassword: null,
-				sessionId: null
+				sessionId: null,
+				recipes: null
 			}
 		},
 		mounted() {
 			// Check if the user is already logged in from local storage
 			this.sessionId = localStorage.getItem('sessionId')
-
+// If the user is logged in, get the recipes
+			if (this.sessionId) {
+				this.getRecipes()
+			}
 		},
 		methods: {
+
+			getRecipes() {
+				this.send('GET', '/recipes').then(response => {
+					if (response.ok) {
+						this.recipes = response.body
+					}
+				})
+			},
 			showModal: function (modalId) {
 				this.modalHandler = new bootstrap.Modal(document.getElementById(modalId), {
 					keyboard: false
@@ -192,6 +235,8 @@
 				if (response.ok) {
 					alert('User created')
 					this.modalHandler.hide()
+					// Get the recipes
+					this.getRecipes()
 				}
 
 			},
@@ -225,6 +270,7 @@
 			clearStorageAndResetSessionId: function () {
 				localStorage.removeItem('sessionId')
 				this.sessionId = null
+				this.recipes = null
 			}
 		}
 	}).mount('#app')

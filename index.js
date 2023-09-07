@@ -4,8 +4,8 @@ const bcrypt = require("bcrypt");
 const app = express();
 require("dotenv").config();
 const port = process.env.PORT || 3000;
-const { v4: uuidv4 } = require("uuid");
-
+const {v4: uuidv4} = require("uuid");
+const {verifyEmailDomain} = require('email-domain-verifier');
 // Add Swagger UI
 const swaggerUi = require("swagger-ui-express");
 const yamlJs = require("yamljs");
@@ -16,160 +16,193 @@ app.use(express.static("public"));
 app.use(express.json());
 
 const users = [
-  {
-    id: 1,
-    email: "admin",
-    password: "$2b$10$0EfA6fMFRDVQWzU0WR1dmelPA7.qSp7ZYJAgneGsy2ikQltX2Duey",
-  }, // KollneKollne
+    {
+        id: 1,
+        email: "admin",
+        password: "$2b$10$0EfA6fMFRDVQWzU0WR1dmelPA7.qSp7ZYJAgneGsy2ikQltX2Duey",
+    }, // KollneKollne
 ];
 
+const recipes = [
+    {
+        id: 1,
+        title: 'Recipe 1',
+        content: 'This is the content of recipe 1',
+        userId: 1
+    },
+    {
+        id: 2,
+        title: 'Recipe 2',
+        content: 'This is the content of recipe 2',
+        userId: 2
+    },
+    {
+        id: 3,
+        title: 'Recipe 3',
+        content: 'This is the content of recipe 3',
+        userId: 1
+    }
+]
+
 let sessions = [
-  // {id: '123', userId: 1}
+    {id: '123', userId: 1}
 ];
 
 function tryToParseJson(jsonString) {
-  try {
-    let o = JSON.parse(jsonString);
-    if (o && typeof o === "object") {
-      return o;
+    try {
+        var o = JSON.parse(jsonString);
+        if (o && typeof o === "object") {
+            return o;
+        }
+    } catch (e) {
     }
-  } catch (e) {}
-  return false;
+    return false;
 }
 
+
 app.post("/users", async (req, res) => {
-  // Validate email and password
-  if (!req.body.email || !req.body.password)
-    return res.status(400).send("Email and password are required");
-  if (req.body.password.length < 8)
-    return res.status(400).send("Password must be at least 8 characters long");
-  if (!req.body.email.match(/^[+a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/))
-    return res.status(400).send("Email must be in a valid format");
+    // Validate email and password
+    if (!req.body.email || !req.body.password)
+        return res.status(400).send("Email and password are required");
+    if (req.body.password.length < 8)
+        return res.status(400).send("Password must be at least 8 characters long");
+    if (!req.body.email.match(/^[+a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/))
+        return res.status(400).send("Email must be in a valid format");
 
-  // Check if email already exists
-  if (users.find((user) => user.email === req.body.email))
-    return res.status(409).send("Email already exists");
+    // Check if email already exists
+    if (users.find((user) => user.email === req.body.email))
+        return res.status(409).send("Email already exists");
 
-  // Try to contact the mail server and send a test email without actually sending it
-  try {
-    const result = await verifyEmail(req.body.email);
-    if (!result.success) {
-      return res.status(400).send("Invalid email: " + result.info);
+    // Try to contact the mail server and send a test email without actually sending it
+    try {
+        const result = await verifyEmailDomain(req.body.email, {smtpNotRequired: process.env.EMAIL_VERIFY_SMTP_NOT_REQUIRED === 'true'})
+
+        if (!result.verified) {
+            return res.status(400).send('Invalid Email:' + result.info)
+        }
+        console.log("Email verified");
+    } catch (error) {
+        const errorObject = tryToParseJson(error);
+        if (errorObject && errorObject.info) {
+            return res.status(400).send("Invalid email: " + errorObject.info);
+        }
+        return res.status(400).send("Invalid email: " + error);
     }
-    console.log("Email verified");
-  } catch (error) {
-    const errorObject = tryToParseJson(error);
-    if (errorObject && errorObject.info) {
-      return res.status(400).send("Invalid email: " + errorObject.info);
+
+    // Hash password
+    let hashedPassword;
+    try {
+        hashedPassword = await bcrypt.hash(req.body.password, 10);
+    } catch (error) {
+        console.error(error);
     }
-    return res.status(400).send("Invalid email: " + error);
-  }
 
-  // Hash password
-  let hashedPassword;
-  try {
-    hashedPassword = await bcrypt.hash(req.body.password, 10);
-  } catch (error) {
-    console.error(error);
-  }
+    // Find max id
+    const maxId = users.reduce(
+        (max, user) => (user.id > max ? user.id : max),
+        users[0].id
+    );
 
-  // Find max id
-  const maxId = users.reduce(
-    (max, user) => (user.id > max ? user.id : max),
-    users[0].id
-  );
+    // Save user to database
+    users.push({
+        id: maxId + 1,
+        email: req.body.email,
+        password: hashedPassword,
+    });
 
-  // Save user to database
-  users.push({
-    id: maxId + 1,
-    email: req.body.email,
-    password: hashedPassword,
-  });
-
-  res.status(201).end();
+    res.status(201).end();
 });
 
 // POST /sessions
 app.post("/sessions", async (req, res) => {
-  // Validate email and password
-  if (!req.body.email || !req.body.password)
-    return res.status(400).send("Email and password are required");
+    // Validate email and password
+    if (!req.body.email || !req.body.password)
+        return res.status(400).send("Email and password are required");
 
-  // Find user in database
-  const user = users.find((user) => user.email === req.body.email);
-  if (!user) return res.status(404).send("User not found");
+    // Find user in database
+    const user = users.find((user) => user.email === req.body.email);
+    if (!user) return res.status(404).send("User not found");
 
-  // Compare password
-  try {
-    if (await bcrypt.compare(req.body.password, user.password)) {
-      // Create session
-      const session = { id: uuidv4(), userId: user.id };
+    // Compare password
+    try {
+        if (await bcrypt.compare(req.body.password, user.password)) {
+            // Create session
+            const session = {id: uuidv4(), userId: user.id};
 
-      // Add session to sessions array
-      sessions.push(session);
+            // Add session to sessions array
+            sessions.push(session);
 
-      // Send session to client
-      res.status(201).send(session);
-    } else {
-      res.status(401).send("Invalid password");
+            // Send session to client
+            res.status(201).send(session);
+        } else {
+            res.status(401).send("Invalid password");
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Internal server error");
     }
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Internal server error");
-  }
 });
 
 function authorizeRequest(req, res, next) {
-  // Check that there is an authorization header
-  if (!req.headers.authorization)
-    return res.status(401).send("Missing authorization header");
+    // Check that there is an authorization header
+    if (!req.headers.authorization)
+        return res.status(401).send("Missing authorization header");
 
-  // Check that the authorization header is in the correct format
-  const authorizationHeader = req.headers.authorization.split(" ");
-  if (authorizationHeader.length !== 2 || authorizationHeader[0] !== "Bearer")
-    return res.status(400).send("Invalid authorization header");
+    // Check that the authorization header is in the correct format
+    const authorizationHeader = req.headers.authorization.split(" ");
+    if (authorizationHeader.length !== 2 || authorizationHeader[0] !== "Bearer")
+        return res.status(400).send("Invalid authorization header");
 
-  // Get sessionId from authorization header
-  const sessionId = authorizationHeader[1];
+    // Get sessionId from authorization header
+    const sessionId = authorizationHeader[1];
 
-  // Find session in sessions array
-  const session = sessions.find((session) => session.id === sessionId);
-  if (!session) return res.status(401).send("Invalid session");
+    // Find session in sessions array
+    const session = sessions.find((session) => session.id === sessionId);
+    if (!session) return res.status(401).send("Invalid session");
 
-  // Check that the user exists
-  const user = users.find((user) => user.id === session.userId);
-  if (!user) return res.status(401).send("Invalid session");
+    // Check that the user exists
+    const user = users.find((user) => user.id === session.userId);
+    if (!user) return res.status(401).send("Invalid session");
 
-  // Add user to request object
-  req.user = user;
+    // Add user to request object
+    req.user = user;
 
-  // Add session to request object
-  req.session = session;
+    // Add session to request object
+    req.session = session;
 
-  // Call next middleware
-  next();
+    // Call next middleware
+    next();
 }
 
-app.delete("/sessions", authorizeRequest, (req, res) => {
-  // Remove session from sessions array
-  sessions = sessions.filter((session) => session.id !== req.session.id);
+app.get('/recipes', authorizeRequest, (req, res) => {
 
-  res.status(204).end();
+    // Get recipes for user
+    const recipesForUser = recipes.filter(recipe => recipe.userId === req.user.id)
+
+    // Send recipes to client
+    res.send(recipesForUser)
+})
+
+app.delete("/sessions", authorizeRequest, (req, res) => {
+    // Remove session from sessions array
+    sessions = sessions.filter((session) => session.id !== req.session.id);
+
+    res.status(204).end();
 });
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+    console.log(`App running at http://localhost:${port}. Documentation at http://localhost:${port}/docs`)
 });
 
 function verifyEmail(email) {
-  return new Promise((resolve, reject) => {
-    verifier.verify(email, (err, info) => {
-      console.log(err, info);
-      if (err) {
-        reject(JSON.stringify(info));
-      } else {
-        resolve(info);
-      }
+    return new Promise((resolve, reject) => {
+        verifier.verify(email, (err, info) => {
+            console.log(err, info);
+            if (err) {
+                reject(JSON.stringify(info));
+            } else {
+                resolve(info);
+            }
+        });
     });
-  });
 }
