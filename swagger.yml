@@ -1,6 +1,6 @@
 openapi: 3.0.2
 info:
-  title: RecipeBook
+  title: Recipebook
   version: 1.0.0
 paths:
   /users:
@@ -14,19 +14,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: "#/components/schemas/User"
         required: true
       tags:
         - /users
       responses:
-        '201':
+        "201":
           description: Successful response.
-        '400':
+        "400":
           content:
             text/html:
               examples:
-                'Invalid email: {reason}':
-                  value: 'Invalid email: {reason}'
+                "Invalid email: {reason}":
+                  value: "Invalid email: {reason}"
                 Email and password are required:
                   value: Email and password are required
                 Password must be at least 8 characters long:
@@ -34,7 +34,7 @@ paths:
                 Email must be in a valid format:
                   value: Email must be in a valid format
           description: Client side error
-        '409':
+        "409":
           content:
             text/html:
               examples:
@@ -44,18 +44,90 @@ paths:
       operationId: createUser
       summary: Create a User
       description: Creates a new instance of a `User`.
+  /sessions:
+    summary: Path used to manage the list of sessions.
+    description: >-
+      The REST endpoint/path used to list and create zero or more `Session` entities.  This path
+      contains a `GET` and `POST` operation to perform the list and create tasks, respectively.
+    post:
+      requestBody:
+        description: A new `Session` to be created.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Credentials"
+        required: true
+      tags:
+        - /sessions
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+          description: Successful response.
+        "400":
+          content:
+            text/html:
+              examples:
+                Email and password are required:
+                  value: Email and password are required
+          description: Bad Request
+        "401":
+          content:
+            text/html:
+              examples:
+                Invalid password:
+                  value: Invalid password
+          description: Unauthorized
+        "404":
+          content:
+            text/html:
+              examples:
+                User not found:
+                  value: User not found
+          description: Not Found
+      operationId: createSession
+      summary: Create a Session
+      description: "Creates a new instance of a `Session`, signing the user in. Returns session ID."
+    delete:
+      tags:
+        - /sessions
+      responses:
+        "204":
+          description: Successful response.
+        "400":
+          content:
+            text/html:
+              examples:
+                Invalid authorization header:
+                  value: Invalid authorization header
+          description: Bad Request
+        "401":
+          content:
+            text/html:
+              examples:
+                Missing authorization header:
+                  value: Missing authorization header
+                Invalid session:
+                  value: Invalid session
+          description: Unauthorized
+      security:
+        - Bearer: []
+      summary: Destroy a Session
+      description: "Destroys a `Session`, signing the user out. Reads the session ID from Authorization header."
 components:
   schemas:
     User:
       title: Root Type for User
-      description: ''
+      description: ""
       type: object
       properties:
         id:
           format: int32
           description: A field that represents the unique identifier of the user.
           type: integer
-          example: '12345'
+          example: "12345"
         email:
           description: A field that represents the email address of the user.
           type: string
@@ -68,6 +140,37 @@ components:
         id: 3
         email: email@example.com
         password: pass123
+    Session:
+      title: Root Type for Session
+      description: ""
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          format: int32
+          type: integer
+      example:
+        id: 330d67de-432b-48ce-a617-0bd6774ebcee
+        userId: 1
+    Credentials:
+      title: Root Type for Credentials
+      description: ""
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      example:
+        email: admin
+        password: KollneKollne
+  securitySchemes:
+    Bearer:
+      scheme: bearer
+      type: http
 tags:
   - name: /users
-    description: ''
+    description: ""
+  - name: /sessions
+    description: ""
