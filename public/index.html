@@ -10,7 +10,7 @@
 
 	<!-- Core theme CSS (includes Bootstrap)-->
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
-				integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+		  integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
 
 	<!-- Favicon -->
 	<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
@@ -50,21 +50,24 @@
 			<p class="lead">This is a simple RecipeBook app</p>
 			<div class="row">
 				<button type="button" class="btn btn-primary" data-bs-toggle="modal" v-if="!sessionId"
-								@click="showModal('signUpModal')">
+						@click="showModal('signUpModal')">
 					Sign Up
 				</button>
 				&nbsp;
 				<button type="button" class="btn btn-primary" data-bs-toggle="modal" v-if="!sessionId"
-								@click="showModal('signInModal')">
+						@click="showModal('signInModal')">
 					Sign In
 				</button>
 				<button type="button" class="btn btn-primary" data-bs-toggle="modal" v-if="sessionId" @click="signOut">
 					Sign Out
 				</button>
+				&nbsp;
+				<button type="button" class="btn btn-primary" data-bs-toggle="modal" v-if="sessionId"
+						@click="showModal('addRecipeModal')">
+					Add Recipe
+				</button>
 			</div>
-
 			&nbsp;
-
 			<!-- List of recipes -->
 			<div id="recipe-list">
 				<div v-for="recipe in recipes" class="recipe-card">
@@ -72,6 +75,7 @@
 					{{ recipe.content }}
 				</div>
 			</div>
+
 		</div>
 	</div>
 
@@ -135,6 +139,36 @@
 		</div>
 	</div>
 
+	<!-- Add Recipe Modal -->
+	<div class="modal fade" id="addRecipeModal" tabindex="-1" aria-labelledby="signInModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h1 class="modal-title fs-5" id="signInModalLabel">Add Recipe</h1>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div class="mb-3 row">
+						<label for="addRecipeTitle" class="col-sm-2 col-form-label">Title</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="addRecipeTitle" v-model="addRecipeTitle">
+						</div>
+					</div>
+					<div class="mb-3 row">
+						<label for="addRecipeContent" class="col-sm-2 col-form-label">Content</label>
+						<div class="col-sm-10">
+							<textarea class="form-control" id="addRecipeContent" v-model="addRecipeContent"></textarea>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary" @click="addRecipe">Add Recipe</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
 </div>
 
 <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -161,16 +195,20 @@
 				signInEmail: null,
 				signInPassword: null,
 				sessionId: null,
-				recipes: null
+				recipes: null,
+				addRecipeTitle: null,
+				addRecipeContent: null
 			}
 		},
 		mounted() {
 			// Check if the user is already logged in from local storage
 			this.sessionId = localStorage.getItem('sessionId')
-// If the user is logged in, get the recipes
+
+			// If the user is logged in, get the recipes
 			if (this.sessionId) {
 				this.getRecipes()
 			}
+
 		},
 		methods: {
 
@@ -181,6 +219,7 @@
 					}
 				})
 			},
+
 			showModal: function (modalId) {
 				this.modalHandler = new bootstrap.Modal(document.getElementById(modalId), {
 					keyboard: false
@@ -220,12 +259,12 @@
 					headers,
 					body: JSON.stringify(body)
 				})
-								.then(CheckError)
-								.then((jsonResponse) => {
-									return jsonResponse
-								}).catch((error) => {
-									throw Error('Network error: ' + error);
-								});
+						.then(CheckError)
+						.then((jsonResponse) => {
+							return jsonResponse
+						}).catch((error) => {
+							throw Error('Network error: ' + error);
+						});
 			},
 			signUp: async function () {
 				// Send POST /users
@@ -235,8 +274,6 @@
 				if (response.ok) {
 					alert('User created')
 					this.modalHandler.hide()
-					// Get the recipes
-					this.getRecipes()
 				}
 
 			},
@@ -256,6 +293,9 @@
 					// Close the modal
 					this.modalHandler.hide()
 
+					// Get the recipes
+					this.getRecipes()
+
 				}
 			},
 			signOut: async function () {
@@ -271,15 +311,44 @@
 				localStorage.removeItem('sessionId')
 				this.sessionId = null
 				this.recipes = null
+			},
+			addRecipe: function () {
+
+				// Validate the form
+				if (!this.addRecipeTitle.trim()) {
+					alert('Please enter a valid title')
+					return
+				}
+				if (!this.addRecipeContent.trim()) {
+					alert('Please enter a valid content')
+					return
+				}
+				// Validate that content string is not too long
+				if (this.addRecipeContent.length > 1000) {
+					alert('Content is too long')
+					return
+				}
+
+				// Send POST /recipes
+				const title = this.addRecipeTitle
+				const content = this.addRecipeContent
+				this.send('POST', '/recipes', {title, content}).then(response => {
+					if (response.ok) {
+						alert('Recipe added')
+						this.recipes.push(response.body)
+						this.modalHandler.hide()
+					}
+				})
 			}
+
 		}
 	}).mount('#app')
 </script>
 
 <!-- Bootstrap core JS-->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"
-				integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V"
-				crossorigin="anonymous">
+		integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V"
+		crossorigin="anonymous">
 </script>
 </body>
 </html>

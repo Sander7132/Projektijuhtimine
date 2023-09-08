@@ -131,8 +131,8 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Recipe'
-          description: Successful response - returns an array of `Recipe` entities.
+                  $ref: '#/components/schemas/Recipes'
+          description: Successful response - returns an array of `Recipes` entities.
         '400':
           content:
             text/html:
@@ -153,7 +153,46 @@ paths:
         - Bearer: [ ]
       operationId: getRecipes
       summary: List All Recipes
-      description: Gets a list of all `Recipe` entities.
+      description: Gets a list of all `Recipes` entities.
+    post:
+      requestBody:
+        description: A new `Recipes` to be created.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Recipes'
+            examples:
+              Recipe:
+                value:
+                  content: some text
+                  title: some text
+        required: true
+      tags:
+        - /recipes
+      responses:
+        '201':
+          description: Successful response.
+        '400':
+          content:
+            text/html:
+              examples:
+                Invalid authorization header:
+                  value: Invalid authorization header
+          description: Bad Request
+        '401':
+          content:
+            text/html:
+              examples:
+                Missing authorization header:
+                  value: Missing authorization header
+                Invalid session:
+                  value: Invalid session
+          description: Unauthorized
+      security:
+        - Bearer: [ ]
+      operationId: createRecipe
+      summary: Create a Recipe
+      description: Creates a new instance of a `Recipe`.
 components:
   schemas:
     User:
@@ -219,9 +258,9 @@ components:
           format: int32
           type: integer
       example:
-        content: This is the content of recipe 1
+        content: This is the content of example recipe 1
         id: 1
-        title: Recipe 1
+        title: Example 1
         userId: 1
   securitySchemes:
     Bearer:
