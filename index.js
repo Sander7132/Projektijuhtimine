@@ -11,6 +11,7 @@ const swaggerUi = require('swagger-ui-express');
 const yamlJs = require('yamljs');
 const swaggerDocument = yamlJs.load('./swagger.yml');
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+const expressWs = require('express-ws')(app);
 
 app.use(express.static('public'))
 app.use(express.json())
@@ -186,6 +187,23 @@ app.post('/recipes', authorizeRequest, (req, res) => {
     res.status(201).send(recipes[recipes.length - 1])
 })
 
+app.delete('/recipes/:id', authorizeRequest, (req, res) => {
+
+    // Find recipe in database
+    const recipe = recipes.find(recipe => recipe.id === parseInt(req.params.id))
+    if (!recipe) return res.status(404).send('Recipe not found')
+
+    // Check that the recipe belongs to the user
+    if (recipe.userId !== req.user.id) return res.status(401).send('Unauthorized')
+
+    // Remove recipe from recipes array
+    recipes.splice(recipes.indexOf(recipe), 1)
+
+    // Send delete event to clients
+    expressWs.getWss().clients.forEach(client => client.send(JSON.stringify({event: 'delete', id: recipe.id})));
+
+    res.status(204).end()
+})
 app.delete('/sessions', authorizeRequest, (req, res) => {
 
     // Remove session from sessions array
