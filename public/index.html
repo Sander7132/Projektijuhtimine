@@ -10,32 +10,39 @@
 
 	<!-- Core theme CSS (includes Bootstrap)-->
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
-		  integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+				integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+
 	<!-- Favicon -->
 	<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
 	<link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
 	<link rel="manifest" href="/icons/site.webmanifest">
 	<style>
+
 		#recipe-list {
 			display: grid;
 			grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 			grid-gap: 1rem;
 			grid-auto-rows: minmax(100px, auto);
 		}
+
 		.recipe-card {
 			background-color: #f8f9fa;
 			border: 1px solid #dee2e6;
 			border-radius: .25rem;
 			padding: 1rem;
 		}
+
 		.recipe-card:hover {
 			background-color: #e9ecef;
 		}
+
 	</style>
 </head>
 <body>
+
 <div id="app">
+
 	<!-- Page content-->
 	<div class="container">
 		<div class="text-center mt-5">
@@ -43,12 +50,12 @@
 			<p class="lead">This is a simple RecipeBook app</p>
 			<div class="row">
 				<button type="button" class="btn btn-primary" data-bs-toggle="modal" v-if="!sessionId"
-						@click="showModal('signUpModal')">
+								@click="showModal('signUpModal')">
 					Sign Up
 				</button>
 				&nbsp;
 				<button type="button" class="btn btn-primary" data-bs-toggle="modal" v-if="!sessionId"
-						@click="showModal('signInModal')">
+								@click="showModal('signInModal')">
 					Sign In
 				</button>
 				<button type="button" class="btn btn-primary" data-bs-toggle="modal" v-if="sessionId" @click="signOut">
@@ -56,7 +63,7 @@
 				</button>
 				&nbsp;
 				<button type="button" class="btn btn-primary" data-bs-toggle="modal" v-if="sessionId"
-						@click="showModal('addRecipeModal')">
+								@click="showModal('addRecipeModal')">
 					Add Recipe
 				</button>
 			</div>
@@ -64,14 +71,20 @@
 			<!-- List of recipes -->
 			<div id="recipe-list">
 				<div v-for="recipe in recipes" class="recipe-card">
-					<button type="button" class="btn-close" aria-label="Close" @click="deleteRecipe(recipe.id)"></button>
-					<button type="button" class="btn btn-primary" data-bs-toggle="modal" @click="showModal('editRecipeModal', recipe.id)">Edit</button><br>
+					<button type="button" class="btn-close" aria-label="Close"
+									@click="deleteRecipe(recipe.id)"></button>
+					<button type="button" class="btn btn-primary" data-bs-toggle="modal"
+									@click="showModal('editRecipeModal', recipe.id)">Edit
+					</button>
+					<br>
 					{{ recipe.title }}<br>
 					{{ recipe.content }}
 				</div>
 			</div>
+
 		</div>
 	</div>
+
 	<!-- Sign Up Modal -->
 	<div class="modal fade" id="signUpModal" tabindex="-1" aria-labelledby="signUpModalLabel" aria-hidden="true">
 		<div class="modal-dialog">
@@ -101,6 +114,7 @@
 			</div>
 		</div>
 	</div>
+
 	<!-- Sign In Modal -->
 	<div class="modal fade" id="signInModal" tabindex="-1" aria-labelledby="signInModalLabel" aria-hidden="true">
 		<div class="modal-dialog">
@@ -162,7 +176,8 @@
 	</div>
 
 	<!-- Edit Recipe Modal -->
-	<div class="modal fade" id="editRecipeModal" tabindex="-1" aria-labelledby="editRecipeModalLabel" aria-hidden="true">
+	<div class="modal fade" id="editRecipeModal" tabindex="-1" aria-labelledby="editRecipeModalLabel"
+			 aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -179,7 +194,8 @@
 					<div class="mb-3 row">
 						<label for="editRecipeContent" class="col-sm-2 col-form-label">Content</label>
 						<div class="col-sm-10">
-							<textarea class="form-control" id="editRecipeContent" v-model="editRecipeContent"></textarea>
+                            <textarea class="form-control" id="editRecipeContent"
+																			v-model="editRecipeContent"></textarea>
 						</div>
 					</div>
 				</div>
@@ -193,7 +209,9 @@
 </div>
 
 <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
 <script>
+
 	function tryToParseJSON(jsonString) {
 		try {
 			const o = JSON.parse(jsonString)
@@ -204,7 +222,8 @@
 		}
 		return false
 	}
-	Vue.createApp({
+
+	const vue = Vue.createApp({
 		data() {
 			return {
 				modalHandler: null,
@@ -221,23 +240,30 @@
 			}
 		},
 
-		mounted() {
+		async mounted() {
 			// Check if the user is already logged in from local storage
 			this.sessionId = localStorage.getItem('sessionId')
+
 			// If the user is logged in, get the recipes
 			if (this.sessionId) {
-				this.getRecipes()
+				this.getRecipesFromLocalStorage()
+				await this.getAndCacheRecipes()
 			}
 		},
 		methods: {
-			getRecipes() {
-				this.send('GET', '/recipes').then(response => {
+
+			getRecipesFromLocalStorage() {
+				this.recipes = JSON.parse(localStorage.getItem('recipes'))
+			},
+			async getAndCacheRecipes() {
+				await this.send('GET', '/recipes').then(response => {
 					if (response.ok) {
 						this.recipes = response.body
+						// Save recipes to the local storage
+						localStorage.setItem('recipes', JSON.stringify(this.recipes))
 					}
 				})
 			},
-
 			showModal: function (modalId, Id) {
 				if (Id) {
 					this.recipe = this.recipes.find(recipe => recipe.id === Id)
@@ -249,7 +275,6 @@
 				})
 				this.modalHandler.show()
 			},
-
 			send: function (method, url, body) {
 				const vue = this;
 
@@ -271,6 +296,7 @@
 						return {ok: false, status: response.status, body: responseObject || responseText}
 					}
 				}
+
 				const headers = {
 					'Content-Type': 'application/json'
 				};
@@ -282,12 +308,12 @@
 					headers,
 					body: JSON.stringify(body)
 				})
-						.then(CheckError)
-						.then((jsonResponse) => {
-							return jsonResponse
-						}).catch((error) => {
-							throw Error('Network error: ' + error);
-						});
+								.then(CheckError)
+								.then((jsonResponse) => {
+									return jsonResponse
+								}).catch((error) => {
+									throw Error('Network error: ' + error);
+								});
 			},
 			signUp: async function () {
 				// Send POST /users
@@ -305,14 +331,21 @@
 				const password = this.signInPassword
 				const response = await this.send('POST', '/sessions', {email, password});
 				if (response.ok) {
+
 					// Store the token in localStorage
 					localStorage.setItem('sessionId', response.body.id)
+
 					// Sign in the user
 					this.sessionId = response.body.id
+
 					// Close the modal
 					this.modalHandler.hide()
-					// Get the recipes
-					this.getRecipes()
+
+					// Get recipes from local storage
+					alert('Using outdated data from local storage.')
+					this.getRecipesFromLocalStorage()
+					await this.getAndCacheRecipes()
+					alert('Recipes updated.')
 				}
 			},
 			signOut: async function () {
@@ -321,6 +354,7 @@
 				if (response.ok) {
 					this.clearStorageAndResetSessionId()
 				}
+
 			},
 			clearStorageAndResetSessionId: function () {
 				localStorage.removeItem('sessionId')
@@ -342,29 +376,34 @@
 					alert('Content is too long')
 					return
 				}
+
 				// Send POST /recipes
 				const title = this.addRecipeTitle
 				const content = this.addRecipeContent
 				this.send('POST', '/recipes', {title, content}).then(response => {
 					if (response.ok) {
+						this.getAndCacheRecipes()
 						alert('Recipe added')
+
 						this.recipes.push(response.body)
 						this.modalHandler.hide()
 					}
 				})
+				// alert('Recipe added')
+				// this.getAndCacheRecipes()
 			},
 			deleteRecipe: function (recipeId) {
 				// Send DELETE /recipes/:id
 				this.send('DELETE', '/recipes/' + recipeId).then(response => {
 					if (response.ok) {
+						this.getAndCacheRecipes()
 						alert('Recipe deleted')
+
 						this.recipes = this.recipes.filter(recipe => recipe.id !== recipeId)
 					}
 				})
 			},
-
 			editRecipe: function (recipeId) {
-
 				// Validate the form
 				if (!this.editRecipeTitle.trim()) {
 					alert('Please enter a valid title')
@@ -385,7 +424,9 @@
 				const content = this.editRecipeContent
 				this.send('PUT', '/recipes/' + recipeId, {title, content}).then(response => {
 					if (response.ok) {
+						this.getAndCacheRecipes()
 						alert('Recipe edited')
+
 						this.recipes = this.recipes.map(recipe => {
 							if (recipe.id === recipeId) {
 								return response.body
@@ -393,8 +434,7 @@
 							return recipe
 						})
 						this.modalHandler.hide()
-					}
-					else {
+					} else {
 						alert('Error editing recipe')
 					}
 				})
@@ -403,10 +443,11 @@
 		}
 	}).mount('#app')
 </script>
+
 <!-- Bootstrap core JS-->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"
-		integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V"
-		crossorigin="anonymous">
+				integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V"
+				crossorigin="anonymous">
 </script>
 </body>
 </html>

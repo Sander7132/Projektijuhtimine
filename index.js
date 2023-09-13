@@ -1,43 +1,51 @@
 const express = require('express')
+const verifier = require('@gradeup/email-verify')
 const bcrypt = require('bcrypt')
 const app = express()
 require('dotenv').config()
 const port = process.env.PORT || 3000
 const {v4: uuidv4} = require('uuid');
-const {verifyEmailDomain} = require('email-domain-verifier');
+
 // Add Swagger UI
 const swaggerUi = require('swagger-ui-express');
 const yamlJs = require('yamljs');
 const swaggerDocument = yamlJs.load('./swagger.yml');
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 app.use(express.static('public'))
 app.use(express.json())
+
 const users = [
-    {id: 1, email: 'admin', password: '$2b$10$0EfA6fMFRDVQWzU0WR1dmelPA7.qSp7ZYJAgneGsy2ikQltX2Duey'} // admin123
+    {id: 1, email: 'admin', password: '$2b$10$NSGEJTcVuxP4Jb3yV0Fd8e4KCIXqqhf85Tu4txSuRi1Hd3iiEGvC2'} // admin123
 ]
+
 const recipes = [
-    // {
-    // 		id: 1,
-    // 		title: 'Example 1',
-    // 		content: 'This is the content of example recipe 1',
-    // 		userId: 1
-    // },
-    // {
-    // 		id: 2,
-    // 		title: 'Example 2',
-    // 		content: 'This is the content of example recipe 2',
-    // 		userId: 2
-    // },
-    // {
-    // 		id: 3,
-    // 		title: 'Example 3',
-    // 		content: 'This is the content of example recipe 3',
-    // 		userId: 1
-    // }
+    {
+        id: 1,
+        title: 'Example 1',
+        content: 'This is the content of example recipe 1',
+        userId: 1
+    },
+    {
+        id: 2,
+        title: 'Example 2',
+        content: 'This is the content of example recipe 2',
+        userId: 2
+    },
+    {
+        id: 3,
+        title: 'Example 3',
+        content: 'This is the content of example recipe 3',
+        userId: 1
+    }
 ]
+
 let sessions = [
     // {id: '123', userId: 1}
 ]
+
+const delay = ms => new Promise(res => setTimeout(res, ms));
+
 function tryToParseJson(jsonString) {
     try {
         var o = JSON.parse(jsonString);
@@ -48,35 +56,32 @@ function tryToParseJson(jsonString) {
     }
     return false;
 }
+
 app.post('/users', async (req, res) => {
 
     // Validate email and password
-    if (!req.body.email || !req.body.password)
-        return res.status(400).send("Email and password are required");
-    if (req.body.password.length < 8)
-        return res.status(400).send("Password must be at least 8 characters long");
-    if (!req.body.email.match(/^[+a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/))
-        return res.status(400).send("Email must be in a valid format");
+    if (!req.body.email || !req.body.password) return res.status(400).send('Email and password are required')
+    if (req.body.password.length < 8) return res.status(400).send('Password must be at least 8 characters long')
+    if (!req.body.email.match(/^[+a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/)) return res.status(400).send('Email must be in a valid format')
 
     // Check if email already exists
-    if (users.find((user) => user.email === req.body.email))
-        return res.status(409).send("Email already exists");
+    if (users.find(user => user.email === req.body.email)) return res.status(409).send('Email already exists')
 
     // Try to contact the mail server and send a test email without actually sending it
     try {
-        const result = await verifyEmailDomain(req.body.email, {smtpNotRequired: process.env.EMAIL_VERIFY_SMTP_NOT_REQUIRED === 'true'})
-
-        if (!result.verified) {
-            return res.status(400).send('Invalid Email:' + result.info)
+        const result = await verifyEmail(req.body.email);
+        if (!result.success) {
+            return res.status(400).send('Invalid email: ' + result.info)
         }
-        console.log("Email verified");
+        console.log('Email verified')
     } catch (error) {
-        const errorObject = tryToParseJson(error);
+        const errorObject = tryToParseJson(error)
         if (errorObject && errorObject.info) {
-            return res.status(400).send("Invalid email: " + errorObject.info);
+            return res.status(400).send('Invalid email: ' + errorObject.info)
         }
-        return res.status(400).send("Invalid email: " + error);
+        return res.status(400).send('Invalid email: ' + error)
     }
+
     // Hash password
     let hashedPassword
     try {
@@ -93,6 +98,7 @@ app.post('/users', async (req, res) => {
 
     res.status(201).end()
 })
+
 // POST /sessions
 app.post('/sessions', async (req, res) => {
 
@@ -124,6 +130,7 @@ app.post('/sessions', async (req, res) => {
         res.status(500).send('Internal server error')
     }
 })
+
 function authorizeRequest(req, res, next) {
     // Check that there is an authorization header
     if (!req.headers.authorization) return res.status(401).send('Missing authorization header')
@@ -152,7 +159,10 @@ function authorizeRequest(req, res, next) {
     // Call next middleware
     next()
 }
-app.get('/recipes', authorizeRequest, (req, res) => {
+
+app.get('/recipes', authorizeRequest, async (req, res) => {
+
+    await delay(1000)
 
     // Get recipes for user
     const recipesForUser = recipes.filter(recipe => recipe.userId === req.user.id)
@@ -160,6 +170,7 @@ app.get('/recipes', authorizeRequest, (req, res) => {
     // Send recipes to client
     res.send(recipesForUser)
 })
+
 app.post('/recipes', authorizeRequest, (req, res) => {
 
     // Validate title and content
@@ -174,6 +185,7 @@ app.post('/recipes', authorizeRequest, (req, res) => {
     // Send recipe to client
     res.status(201).send(recipes[recipes.length - 1])
 })
+
 app.delete('/recipes/:id', authorizeRequest, (req, res) => {
 
     // Find recipe in database
@@ -216,9 +228,11 @@ app.delete('/sessions', authorizeRequest, (req, res) => {
 
     res.status(204).end()
 })
+
 app.listen(port, () => {
-    console.log(`App running at http://localhost:${port}. Documentation at http://localhost:${port}/docs`)
-});
+    console.log(`Example app listening on port ${port}`)
+})
+
 function verifyEmail(email) {
     return new Promise((resolve, reject) => {
         verifier.verify(email, (err, info) => {
