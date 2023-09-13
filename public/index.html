@@ -3,46 +3,39 @@
 <head>
 	<meta charset="utf-8"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
-	<meta name="description" content=""/>
-	<meta name="author" content=""/>
+	<meta name="description" content="RecipeBook"/>
+	<meta name="author" content="Johannes Gross"/>
 
 	<title>RecipeBook</title>
 
 	<!-- Core theme CSS (includes Bootstrap)-->
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
 		  integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-
 	<!-- Favicon -->
 	<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
 	<link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
 	<link rel="manifest" href="/icons/site.webmanifest">
 	<style>
-
 		#recipe-list {
 			display: grid;
 			grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 			grid-gap: 1rem;
 			grid-auto-rows: minmax(100px, auto);
 		}
-
 		.recipe-card {
 			background-color: #f8f9fa;
 			border: 1px solid #dee2e6;
 			border-radius: .25rem;
 			padding: 1rem;
 		}
-
 		.recipe-card:hover {
 			background-color: #e9ecef;
 		}
-
 	</style>
 </head>
 <body>
-
 <div id="app">
-
 	<!-- Page content-->
 	<div class="container">
 		<div class="text-center mt-5">
@@ -71,17 +64,14 @@
 			<!-- List of recipes -->
 			<div id="recipe-list">
 				<div v-for="recipe in recipes" class="recipe-card">
-					<button type="button" class="btn-close" aria-label="Close"
-							@click="deleteRecipe(recipe.id)"></button>
-					<br>
+					<button type="button" class="btn-close" aria-label="Close" @click="deleteRecipe(recipe.id)"></button>
+					<button type="button" class="btn btn-primary" data-bs-toggle="modal" @click="showModal('editRecipeModal', recipe.id)">Edit</button><br>
 					{{ recipe.title }}<br>
 					{{ recipe.content }}
 				</div>
 			</div>
-
 		</div>
 	</div>
-
 	<!-- Sign Up Modal -->
 	<div class="modal fade" id="signUpModal" tabindex="-1" aria-labelledby="signUpModalLabel" aria-hidden="true">
 		<div class="modal-dialog">
@@ -111,7 +101,6 @@
 			</div>
 		</div>
 	</div>
-
 	<!-- Sign In Modal -->
 	<div class="modal fade" id="signInModal" tabindex="-1" aria-labelledby="signInModalLabel" aria-hidden="true">
 		<div class="modal-dialog">
@@ -143,11 +132,11 @@
 	</div>
 
 	<!-- Add Recipe Modal -->
-	<div class="modal fade" id="addRecipeModal" tabindex="-1" aria-labelledby="signInModalLabel" aria-hidden="true">
+	<div class="modal fade" id="addRecipeModal" tabindex="-1" aria-labelledby="addTecipeModalLabel" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h1 class="modal-title fs-5" id="signInModalLabel">Add Recipe</h1>
+					<h1 class="modal-title fs-5" id="addTecipeModalLabel">Add Recipe</h1>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body">
@@ -172,12 +161,39 @@
 		</div>
 	</div>
 
+	<!-- Edit Recipe Modal -->
+	<div class="modal fade" id="editRecipeModal" tabindex="-1" aria-labelledby="editRecipeModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h1 class="modal-title fs-5" id="editRecipeModalLabel">Edit Recipe</h1>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div class="mb-3 row">
+						<label for="editRecipeTitle" class="col-sm-2 col-form-label">Title</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="editRecipeTitle" v-model="editRecipeTitle">
+						</div>
+					</div>
+					<div class="mb-3 row">
+						<label for="editRecipeContent" class="col-sm-2 col-form-label">Content</label>
+						<div class="col-sm-10">
+							<textarea class="form-control" id="editRecipeContent" v-model="editRecipeContent"></textarea>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary" @click="editRecipe(recipe.id)">Edit Recipe</button>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
 <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-
 <script>
-
 	function tryToParseJSON(jsonString) {
 		try {
 			const o = JSON.parse(jsonString)
@@ -188,7 +204,6 @@
 		}
 		return false
 	}
-
 	Vue.createApp({
 		data() {
 			return {
@@ -200,21 +215,21 @@
 				sessionId: null,
 				recipes: null,
 				addRecipeTitle: null,
-				addRecipeContent: null
+				addRecipeContent: null,
+				editRecipeTitle: null,
+				editRecipeContent: null,
 			}
 		},
+
 		mounted() {
 			// Check if the user is already logged in from local storage
 			this.sessionId = localStorage.getItem('sessionId')
-
 			// If the user is logged in, get the recipes
 			if (this.sessionId) {
 				this.getRecipes()
 			}
-
 		},
 		methods: {
-
 			getRecipes() {
 				this.send('GET', '/recipes').then(response => {
 					if (response.ok) {
@@ -223,12 +238,18 @@
 				})
 			},
 
-			showModal: function (modalId) {
+			showModal: function (modalId, Id) {
+				if (Id) {
+					this.recipe = this.recipes.find(recipe => recipe.id === Id)
+					this.editRecipeTitle = this.recipe.title
+					this.editRecipeContent = this.recipe.content
+				}
 				this.modalHandler = new bootstrap.Modal(document.getElementById(modalId), {
 					keyboard: false
 				})
 				this.modalHandler.show()
 			},
+
 			send: function (method, url, body) {
 				const vue = this;
 
@@ -250,7 +271,6 @@
 						return {ok: false, status: response.status, body: responseObject || responseText}
 					}
 				}
-
 				const headers = {
 					'Content-Type': 'application/json'
 				};
@@ -278,7 +298,6 @@
 					alert('User created')
 					this.modalHandler.hide()
 				}
-
 			},
 			signIn: async function () {
 				// Send POST /sessions
@@ -286,29 +305,22 @@
 				const password = this.signInPassword
 				const response = await this.send('POST', '/sessions', {email, password});
 				if (response.ok) {
-
 					// Store the token in localStorage
 					localStorage.setItem('sessionId', response.body.id)
-
 					// Sign in the user
 					this.sessionId = response.body.id
-
 					// Close the modal
 					this.modalHandler.hide()
-
 					// Get the recipes
 					this.getRecipes()
-
 				}
 			},
 			signOut: async function () {
 				// Send DELETE /sessions
-
 				const response = await this.send('DELETE', '/sessions');
 				if (response.ok) {
 					this.clearStorageAndResetSessionId()
 				}
-
 			},
 			clearStorageAndResetSessionId: function () {
 				localStorage.removeItem('sessionId')
@@ -316,7 +328,6 @@
 				this.recipes = null
 			},
 			addRecipe: function () {
-
 				// Validate the form
 				if (!this.addRecipeTitle.trim()) {
 					alert('Please enter a valid title')
@@ -331,7 +342,6 @@
 					alert('Content is too long')
 					return
 				}
-
 				// Send POST /recipes
 				const title = this.addRecipeTitle
 				const content = this.addRecipeContent
@@ -343,7 +353,6 @@
 					}
 				})
 			},
-
 			deleteRecipe: function (recipeId) {
 				// Send DELETE /recipes/:id
 				this.send('DELETE', '/recipes/' + recipeId).then(response => {
@@ -352,11 +361,48 @@
 						this.recipes = this.recipes.filter(recipe => recipe.id !== recipeId)
 					}
 				})
+			},
+
+			editRecipe: function (recipeId) {
+
+				// Validate the form
+				if (!this.editRecipeTitle.trim()) {
+					alert('Please enter a valid title')
+					return
+				}
+				if (!this.editRecipeContent.trim()) {
+					alert('Please enter a valid content')
+					return
+				}
+				// Validate that content string is not too long
+				if (this.editRecipeContent.length > 1000) {
+					alert('Content is too long')
+					return
+				}
+
+				//Send PUT /recipes/:id
+				const title = this.editRecipeTitle
+				const content = this.editRecipeContent
+				this.send('PUT', '/recipes/' + recipeId, {title, content}).then(response => {
+					if (response.ok) {
+						alert('Recipe edited')
+						this.recipes = this.recipes.map(recipe => {
+							if (recipe.id === recipeId) {
+								return response.body
+							}
+							return recipe
+						})
+						this.modalHandler.hide()
+					}
+					else {
+						alert('Error editing recipe')
+					}
+				})
 			}
+
 		}
 	}).mount('#app')
 </script>
-
 <!-- Bootstrap core JS-->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"
 		integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V"
