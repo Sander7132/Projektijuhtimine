@@ -16,9 +16,12 @@
     "email-domain-verifier": "^1.0.6",
     "express": "^4.18.2",
     "express-ws": "^5.0.2",
-    "nodemon": "^2.0.21",
+    "nodemon": "^3.0.1",
     "swagger-ui-express": "^4.6.2",
     "uuid": "^9.0.0",
     "yamljs": "^0.3.0"
+  },
+  "devDependencies": {
+    "cypress": "^13.2.0"
   }
 }
