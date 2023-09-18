@@ -73,6 +73,7 @@
 				<div v-for="recipe in recipes" class="recipe-card">
 					<button type="button" class="btn-close" aria-label="Close"
 									@click="deleteRecipe(recipe.id)"></button>
+					<br>
 					<button type="button" class="btn btn-primary" data-bs-toggle="modal"
 									@click="showModal('editRecipeModal', recipe.id)">Edit
 					</button>
@@ -442,6 +443,32 @@
 
 		}
 	}).mount('#app')
+
+	// Connect to WebSocket
+	const connection = new WebSocket("ws://localhost:3000/")
+	connection.onmessage = function (message) {
+		// Run method based on message's event
+		message = tryToParseJSON(message.data)
+
+		switch (message.event) {
+			case 'create':
+				vue.recipes.push(message.recipe)
+				break
+			case 'update':
+				// Replace the recipe with the matching id
+				vue.recipes = vue.recipes.map(recipe => {
+					if (recipe.id === message.recipe.id) {
+						return message.recipe
+					}
+					return recipe
+				})
+				break
+			case 'delete':
+				vue.recipes = vue.recipes.filter(recipe => recipe.id !== message.id)
+				break
+		}
+	}
+
 </script>
 
 <!-- Bootstrap core JS-->

@@ -5,6 +5,7 @@ const app = express()
 require('dotenv').config()
 const port = process.env.PORT || 3000
 const {v4: uuidv4} = require('uuid');
+const expressWs = require('express-ws')(app);
 
 // Add Swagger UI
 const swaggerUi = require('swagger-ui-express');
@@ -14,6 +15,12 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use(express.static('public'))
 app.use(express.json())
+
+app.ws('/', function(ws) {
+    ws.on('message', function(msg) {
+        expressWs.getWss().clients.forEach(client => client.send(msg));
+    });
+});
 
 const users = [
     {id: 1, email: 'admin', password: '$2b$10$NSGEJTcVuxP4Jb3yV0Fd8e4KCIXqqhf85Tu4txSuRi1Hd3iiEGvC2'} // admin123
@@ -180,7 +187,13 @@ app.post('/recipes', authorizeRequest, (req, res) => {
     const maxId = recipes.reduce((max, recipe) => recipe.id > max ? recipe.id : max, 0)
 
     // Save recipe to database
-    recipes.push({id: maxId + 1, title: req.body.title, content: req.body.content, userId: req.user.id})
+    const recipe = {id: maxId + 1, title: req.body.title, content: req.body.content, userId: req.user.id}
+
+    // Add recipe to recipes array
+    recipes.push(recipe)
+
+    // Send create event to clients
+    expressWs.getWss().clients.forEach(client => client.send(JSON.stringify({event: 'create', recipe})));
 
     // Send recipe to client
     res.status(201).send(recipes[recipes.length - 1])
@@ -197,6 +210,9 @@ app.delete('/recipes/:id', authorizeRequest, (req, res) => {
 
     // Remove recipe from recipes array
     recipes.splice(recipes.indexOf(recipe), 1)
+
+    // Send delete event to clients
+    expressWs.getWss().clients.forEach(client => client.send(JSON.stringify({event: 'delete', id: recipe.id})));
 
     res.status(204).end()
 })
@@ -216,6 +232,9 @@ app.put('/recipes/:id', authorizeRequest, (req, res) => {
     // Update recipe
     recipe.title = req.body.title
     recipe.content = req.body.content
+
+    // Send update event to clients
+    expressWs.getWss().clients.forEach(client => client.send(JSON.stringify({event: 'update', recipe})));
 
     // Send recipe to client
     res.send(recipe)
