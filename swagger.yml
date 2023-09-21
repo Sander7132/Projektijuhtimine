@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
   title: RecipeBook
-  version: 1.0.0
+  version: 1.4.2
   description: 'Simple RecipeBook app where you can create, view, edit and delete your recipes.'
   license:
     name: MIT License
@@ -19,6 +19,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/User'
+            examples:
+              User:
+                value:
+                  email: test.test@gmail.com
+                  password: Passw0rd
         required: true
       tags:
         - /users
@@ -29,14 +34,14 @@ paths:
           content:
             text/html:
               examples:
-                'Invalid email: {reason}':
-                  value: 'Invalid email: {reason}'
                 Email and password are required:
                   value: Email and password are required
                 Password must be at least 8 characters long:
                   value: Password must be at least 8 characters long
                 Email must be in a valid format:
                   value: Email must be in a valid format
+                'Invalid email: {reason}':
+                  value: 'Invalid email: {reason}'
           description: Client side error
         '409':
           content:
@@ -60,15 +65,23 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Credentials'
+            examples:
+              Credentials:
+                value:
+                  email: admin
+                  password: admin123
         required: true
       tags:
         - /sessions
       responses:
         '201':
           content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Session'
+            text/html:
+              examples:
+                Session:
+                  value:
+                    id: 330d67de-432b-48ce-a617-0bd6774ebcee
+                    userId: 1
           description: Successful response.
         '400':
           content:
@@ -91,6 +104,13 @@ paths:
                 User not found:
                   value: User not found
           description: Not Found
+        '500':
+          content:
+            text/html:
+              examples:
+                Internal server error:
+                  value: Internal server error
+          description: Internal Server Error
       operationId: createSession
       summary: Create a Session
       description: 'Creates a new instance of a `Session`, signing the user in. Returns session ID.'
@@ -117,7 +137,8 @@ paths:
                   value: Invalid session
           description: Unauthorized
       security:
-        - Bearer: [ ]
+        -
+          Bearer: []
       summary: Destroy a Session
       description: 'Destroys a `Session`, signing the user out. Reads the session ID from Authorization header.'
   /recipes:
@@ -131,11 +152,19 @@ paths:
       responses:
         '200':
           content:
-            application/json:
+            text/html:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Recipe'
+              examples:
+                Recipe:
+                  value:
+                    -
+                      id: 3
+                      title: Title
+                      content: Content
+                      userId: 1
           description: Successful response - returns an array of `Recipes` entities.
         '400':
           content:
@@ -155,7 +184,8 @@ paths:
           description: Unauthorized
       deprecated: false
       security:
-        - Bearer: [ ]
+        -
+          Bearer: []
       operationId: getRecipes
       summary: List All Recipes
       description: Gets a list of all `Recipes` entities.
@@ -176,11 +206,22 @@ paths:
         - /recipes
       responses:
         '201':
+          content:
+            text/html:
+              examples:
+                Recipe:
+                  value:
+                    id: 3
+                    title: Title
+                    content: Content
+                    userId: 1
           description: Successful response.
         '400':
           content:
             text/html:
               examples:
+                Title and content are required:
+                  value: Title and content are required
                 Invalid authorization header:
                   value: Invalid authorization header
           description: Bad Request
@@ -195,11 +236,12 @@ paths:
           description: Unauthorized
       deprecated: false
       security:
-        - Bearer: [ ]
+        -
+          Bearer: []
       operationId: createRecipe
       summary: Create a Recipe
       description: Creates a new instance of a `Recipe`.
-  '/recipes/:id':
+  '/recipes/{id}':
     summary: Path used to manage the list of recipes.
     description: >-
       The REST endpoint/path used to edit and delete `Recipe` entities.  This path contains a `PUT` and
@@ -219,42 +261,111 @@ paths:
         required: true
       tags:
         - '/recipes/:id'
+      parameters:
+        -
+          name: id
+          description: A recipe to be edited
+          schema:
+            type: integer
+          in: path
+          required: true
       responses:
+        '200':
+          content:
+            text/html:
+              examples:
+                Recipe:
+                  value:
+                    id: 1
+                    title: some text
+                    content: some text
+                    userId: 1
+          description: OK
         '400':
+          content:
+            text/html:
+              examples:
+                Title and content are required:
+                  value: Title and content are required
+                Invalid authorization header:
+                  value: Invalid authorization header
           description: Bad request (Title and content are required)
         '401':
+          content:
+            text/html:
+              examples:
+                Unauthorized:
+                  value: Unauthorized
+                Invalid session:
+                  value: Invalid session
+                Missing authorization header:
+                  value: Missing authorization header
           description: Unauthorized
         '404':
+          content:
+            text/html:
+              examples:
+                Recipe not found:
+                  value: Recipe not found
           description: Recipe ID not found.
       deprecated: false
       security:
-        - Bearer: [ ]
+        -
+          Bearer: []
       operationId: editRecipe
       summary: Edit Recipe
       description: Updates an instance of `Recipe`.
     delete:
       tags:
         - '/recipes/:id'
+      parameters:
+        -
+          name: id
+          description: A recipe to be deleted
+          schema:
+            type: integer
+          in: path
+          required: true
       responses:
         '204':
           description: Successful response - delets specific `Recipe` from array.
+        '400':
+          content:
+            text/html:
+              examples:
+                Invalid authorization header:
+                  value: Invalid authorization header
+          description: Bad request
         '401':
           content:
-            text/xml:
+            text/html:
               examples:
+                Unauthorized:
+                  value: Unauthorized
                 Missing authorization header:
                   value: Missing authorization header
                 Invalid session:
                   value: Invalid session
           description: Unauthorized
         '404':
+          content:
+            text/html:
+              examples:
+                Recipe not found:
+                  value: Recipe not found
           description: Recipe ID not found in database.
       deprecated: false
       security:
-        - Bearer: [ ]
+        -
+          Bearer: []
       operationId: deleteRecipe
       summary: Delete Recipe
       description: Deletes an instance of a `Recipe`.
+    parameters:
+      -
+        name: id
+        in: path
+        required: true
 components:
   schemas:
     User:
@@ -277,8 +388,8 @@ components:
           example: MySecurePassword123
       example:
         id: 3
-        email: email@example.com
-        password: pass123
+        email: test.test@gmail.com
+        password: Passw0rd
     Session:
       title: Root Type for Session
       description: ''
@@ -303,7 +414,7 @@ components:
           type: string
       example:
         email: admin
-        password: KollneKollne
+        password: admin123
     Recipe:
       title: Root Type for Recipe
       description: ''
@@ -329,11 +440,15 @@ components:
       scheme: bearer
       type: http
 tags:
-  - name: /users
+  -
+    name: /users
     description: ''
-  - name: /sessions
+  -
+    name: /sessions
     description: ''
-  - name: /recipes
+  -
+    name: /recipes
     description: ''
-  - name: '/recipes/:id'
+  -
+    name: '/recipes/:id'
     description: ''
