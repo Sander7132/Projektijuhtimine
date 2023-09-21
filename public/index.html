@@ -445,7 +445,8 @@
 	}).mount('#app')
 
 	// Connect to WebSocket
-	const connection = new WebSocket("ws://localhost:3000/")
+	const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const connection = new WebSocket(protocol + '//' + window.location.hostname + (window.location.port ? ':' + window.location.port : ''));
 	connection.onmessage = function (message) {
 		// Run method based on message's event
 		message = tryToParseJSON(message.data)
