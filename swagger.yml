@@ -366,6 +366,43 @@ paths:
         name: id
         in: path
         required: true
+  /recipes/deleteAll:
+    summary: Delete All Recipes
+    description: Deletes all recipes in the system.
+    delete:
+      tags:
+        - /recipes
+      responses:
+        '204':
+          description: Successful response.
+        '400':
+          content:
+            text/html:
+              examples:
+                Invalid authorization header:
+                  value: Invalid authorization header
+          description: Bad request
+        '401':
+          content:
+            text/html:
+              examples:
+                Unauthorized:
+                  value: Unauthorized
+                Missing authorization header:
+                  value: Missing authorization header
+                Invalid session:
+                  value: Invalid session
+          description: Unauthorized
+      deprecated: false
+      security:
+        - Bearer: [ ]
+      operationId: deleteAllRecipes
+      summary: Delete All Recipes
+      description: Deletes all recipes in the system.
+      parameters:
+        - name: id
+          in: path
+          required: true
 components:
   schemas:
     User:

@@ -10,6 +10,7 @@ const expressWs = require('express-ws')(app);
 // Add Swagger UI
 const swaggerUi = require('swagger-ui-express');
 const yamlJs = require('yamljs');
+const {verifyEmailDomain} = require("email-domain-verifier");
 const swaggerDocument = yamlJs.load('./swagger.yml');
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
@@ -76,9 +77,10 @@ app.post('/users', async (req, res) => {
 
     // Try to contact the mail server and send a test email without actually sending it
     try {
-        const result = await verifyEmail(req.body.email);
-        if (!result.success) {
-            return res.status(400).send('Invalid email: ' + result.info)
+        const result = await verifyEmailDomain(req.body.email, {smtpNotRequired: process.env.EMAIL_VERIFY_SMTP_NOT_REQUIRED === 'true'})
+
+        if (!result.verified) {
+            return res.status(400).send('Invalid Email:' + result.info)
         }
         console.log('Email verified')
     } catch (error) {
@@ -217,6 +219,7 @@ app.delete('/recipes/:id', authorizeRequest, (req, res) => {
     res.status(204).end()
 })
 
+
 app.put('/recipes/:id', authorizeRequest, (req, res) => {
 
     // Validate title and content
@@ -247,10 +250,19 @@ app.delete('/sessions', authorizeRequest, (req, res) => {
 
     res.status(204).end()
 })
+app.delete('/delete-recipes', authorizeRequest, (req, res) => {
+    // Check for authorization if needed
+
+    // Delete all recipes
+    recipes.splice(0, recipes.length);
+
+    // Send a response
+    res.status(204).end();
+});
 
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-})
+    console.log(`App running at http://localhost:${port}. Documentation at http://localhost:${port}/docs`)
+});
 
 function verifyEmail(email) {
     return new Promise((resolve, reject) => {

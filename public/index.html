@@ -66,6 +66,28 @@
 								@click="showModal('addRecipeModal')">
 					Add Recipe
 				</button>
+				<button type="button" class="btn btn-secondary" data-bs-toggle="modal" v-if="sessionId"
+						@click="showModal('deleteRecipeModal')">
+					Delete all Recipes
+				</button>
+				<!-- Delete All Recipes Modal -->
+				<div class="modal fade" id="deleteRecipeModal" tabindex="-1" aria-labelledby="deleteRecipeModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h1 class="modal-title fs-5" id="deleteRecipeModalLabel">Delete All Recipes</h1>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-body">
+								<p>Are you sure you want to delete all recipes?</p>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+								<button type="button" class="btn btn-danger" @click="deleteAllRecipes">Delete All</button>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 			&nbsp;
 			<!-- List of recipes -->
@@ -82,7 +104,6 @@
 					{{ recipe.content }}
 				</div>
 			</div>
-
 		</div>
 	</div>
 
@@ -147,11 +168,11 @@
 	</div>
 
 	<!-- Add Recipe Modal -->
-	<div class="modal fade" id="addRecipeModal" tabindex="-1" aria-labelledby="addTecipeModalLabel" aria-hidden="true">
+	<div class="modal fade" id="addRecipeModal" tabindex="-1" aria-labelledby="addRecipeModalLabel" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h1 class="modal-title fs-5" id="addTecipeModalLabel">Add Recipe</h1>
+					<h1 class="modal-title fs-5" id="addRecipeModalLabel">Add Recipe</h1>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body">
@@ -404,6 +425,22 @@
 					}
 				})
 			},
+			deleteAllRecipes: function () {
+				// Send a request to delete all recipes
+				this.send('DELETE', '/delete-recipes').then(response => {
+					if (response.ok) {
+						// Clear the recipes array
+						this.recipes = [];
+
+						// Close the modal
+						this.modalHandler.hide();
+
+						alert('All recipes have been deleted.');
+					} else {
+						alert('Error deleting recipes');
+					}
+				});
+			},
 			editRecipe: function (recipeId) {
 				// Validate the form
 				if (!this.editRecipeTitle.trim()) {
@@ -440,7 +477,6 @@
 					}
 				})
 			}
-
 		}
 	}).mount('#app')
 
