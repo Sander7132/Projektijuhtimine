@@ -426,17 +426,23 @@
 				})
 			},
 			deleteAllRecipes: function () {
-				if (confirm('Are you sure you want to delete all recipes?')) {
-					// Send DELETE /recipes
-					this.send('DELETE', '/recipes').then(response => {
-						if (response.ok) {
-							this.getAndCacheRecipes()
-							alert('All Recipes deleted')
+				// Send a request to delete all recipes
+				this.send('DELETE', '/recipes').then((response) => {
+					if (response.ok) {
+						// Clear the recipes array
+						this.recipes = [];
 
-							this.recipes = this.recipes.filter(recipe => recipe.id !== recipeId)
-						}
-					})
-				}
+						// Clear the local storage
+						this.getAndCacheRecipes();
+
+						// Close the modal
+						this.modalHandler.hide();
+
+						alert('All recipes have been deleted.');
+					} else {
+						alert('Error deleting all recipes');
+					}
+				});
 			},
 			editRecipe: function (recipeId) {
 				// Validate the form
