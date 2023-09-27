@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
   title: RecipeBook
-  version: 1.4.2
+  version: 1.0.0
   description: 'Simple RecipeBook app where you can create, view, edit and delete your recipes.'
   license:
     name: MIT License
@@ -69,7 +69,7 @@ paths:
               Credentials:
                 value:
                   email: admin
-                  password: admin123
+                  password: admin
         required: true
       tags:
         - /sessions
@@ -241,6 +241,34 @@ paths:
       operationId: createRecipe
       summary: Create a Recipe
       description: Creates a new instance of a `Recipe`.
+    delete:
+      tags:
+        - /recipes
+      responses:
+        '204':
+          description: Successful response - deletes all `Recipe`'s from array.
+        '400':
+          content:
+            text/html:
+              examples:
+                Invalid authorization header:
+                  value: Invalid authorization header
+          description: Bad Request
+        '401':
+          content:
+            text/html:
+              examples:
+                Missing authorization header:
+                  value: Missing authorization header
+                Invalid session:
+                  value: Invalid session
+          description: Unauthorized
+      security:
+        -
+          Bearer: []
+      operationId: deleteAllRecipes
+      summary: Deletes All Recipes
+      description: Deletes all instances of a `Recipe`.
   '/recipes/{id}':
     summary: Path used to manage the list of recipes.
     description: >-
@@ -328,7 +356,7 @@ paths:
           required: true
       responses:
         '204':
-          description: Successful response - delets specific `Recipe` from array.
+          description: Successful response - deletes specific `Recipe` from array.
         '400':
           content:
             text/html:
@@ -366,43 +394,6 @@ paths:
         name: id
         in: path
         required: true
-  /recipes/deleteAll:
-    summary: Delete All Recipes
-    description: Deletes all recipes in the system.
-    delete:
-      tags:
-        - /recipes
-      responses:
-        '204':
-          description: Successful response.
-        '400':
-          content:
-            text/html:
-              examples:
-                Invalid authorization header:
-                  value: Invalid authorization header
-          description: Bad request
-        '401':
-          content:
-            text/html:
-              examples:
-                Unauthorized:
-                  value: Unauthorized
-                Missing authorization header:
-                  value: Missing authorization header
-                Invalid session:
-                  value: Invalid session
-          description: Unauthorized
-      deprecated: false
-      security:
-        - Bearer: [ ]
-      operationId: deleteAllRecipes
-      summary: Delete All Recipes
-      description: Deletes all recipes in the system.
-      parameters:
-        - name: id
-          in: path
-          required: true
 components:
   schemas:
     User:
@@ -451,7 +442,7 @@ components:
           type: string
       example:
         email: admin
-        password: admin123
+        password: admin
     Recipe:
       title: Root Type for Recipe
       description: ''

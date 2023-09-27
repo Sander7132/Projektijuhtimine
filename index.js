@@ -250,11 +250,17 @@ app.delete('/sessions', authorizeRequest, (req, res) => {
 
     res.status(204).end()
 })
-app.delete('/delete-recipes', authorizeRequest, (req, res) => {
-    // Check for authorization if needed
+app.delete('/recipes', authorizeRequest, (req, res) => {
 
-    // Delete all recipes
-    recipes.splice(0, recipes.length);
+    // Get delete requesters id
+    const requesterId = req.user.id
+
+    // Remove all requesters recipes from recipes array
+    for (let i = recipes.length - 1; i >= 0; i--) {
+        if (recipes[i].userId === req.user.id) {
+            recipes.splice(i, 1);
+        }
+    }
 
     // Send a response
     res.status(204).end();
