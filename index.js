@@ -262,6 +262,9 @@ app.delete('/recipes', authorizeRequest, (req, res) => {
         }
     }
 
+    // Send delete event to clients
+    expressWs.getWss().clients.forEach((client) => client.send(JSON.stringify({ event: 'deleteAll', id: requesterId })));
+
     // Send a response
     res.status(204).end();
 });
