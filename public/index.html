@@ -155,12 +155,12 @@
     </div>
 
     <!-- Add Recipe Modal -->
-    <div class="modal fade" id="addRecipeModal" tabindex="-1" aria-labelledby="addRecipeModalLabel" aria-hidden="true">
+    <div class="modal fade" id="addRecipeModal" tabindex="-1" aria-labelledby="addRecipeModalLabel" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="addRecipeModalLabel">Add Recipe</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="clearInputFields('addRecipe')"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3 row">
@@ -177,7 +177,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="clearInputFields('addRecipe')">Close</button>
                     <button type="button" class="btn btn-primary" @click="addRecipe">Add Recipe</button>
                 </div>
             </div>
@@ -186,7 +186,7 @@
 
     <!-- Edit Recipe Modal -->
     <div class="modal fade" id="editRecipeModal" tabindex="-1" aria-labelledby="editRecipeModalLabel"
-         aria-hidden="true">
+         aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -218,7 +218,7 @@
 
     <!-- Delete All Recipes Modal -->
     <div class="modal fade" id="deleteRecipeModal" tabindex="-1" aria-labelledby="deleteRecipeModalLabel"
-         aria-hidden="true">
+         aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -387,34 +387,45 @@
             },
             addRecipe: function () {
                 // Validate the form
-                if (!this.addRecipeTitle.trim()) {
-                    alert('Please enter a valid title');
+                const trimmedTitle = this.addRecipeTitle ? this.addRecipeTitle.trim() : null;
+                const trimmedContent = this.addRecipeContent ? this.addRecipeContent.trim() : null;
+
+                if (!trimmedTitle || !trimmedContent) {
+                    // One or both fields are empty or contain only whitespace
+                    alert('Please enter a valid title and content');
+                    // Reset the invalid fields
+                    if (!trimmedTitle) {
+                        this.addRecipeTitle = null;
+                    }
+                    if (!trimmedContent) {
+                        this.addRecipeContent = null;
+                    }
                     return;
                 }
-                if (!this.addRecipeContent.trim()) {
-                    alert('Please enter a valid content');
-                    return;
-                }
+
                 // Validate that content string is not too long
-                if (this.addRecipeContent.length > 1000) {
+                if (trimmedContent.length > 1000) {
                     alert('Content is too long');
+                    this.addRecipeContent = null;
                     return;
                 }
 
                 // Send POST /recipes
                 const title = this.addRecipeTitle;
                 const content = this.addRecipeContent;
-                this.send('POST', '/recipes', {title, content}).then((response) => {
+                this.send('POST', '/recipes', { title, content }).then((response) => {
                     if (response.ok) {
                         this.getAndCacheRecipes();
                         alert('Recipe added');
 
                         this.recipes.push(response.body);
+
+                        // Clear the input fields
+                        this.clearInputFields('addRecipe');
+
                         this.modalHandler.hide();
                     }
                 });
-                // alert('Recipe added')
-                // this.getAndCacheRecipes()
             },
             deleteRecipe: function (recipeId) {
                 // Send DELETE /recipes/:id
@@ -481,6 +492,16 @@
                         alert('Error editing recipe');
                     }
                 });
+            },
+            clearInputFields: function (fieldGroup) {
+                switch (fieldGroup) {
+                    case 'addRecipe':
+                        this.addRecipeTitle = null;
+                        this.addRecipeContent = null;
+                        break;
+                    default:
+                        break;
+                }
             },
         },
     }).mount('#app');
