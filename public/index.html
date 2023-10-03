@@ -37,6 +37,9 @@
             background-color: #e9ecef;
         }
 
+        .recipe-card button {
+            margin: 2px;
+        }
     </style>
 </head>
 <body>
@@ -80,8 +83,8 @@
             <!-- List of recipes -->
             <div id="recipe-list">
                 <div v-for="recipe in recipes" class="recipe-card">
-                    <button type="button" class="btn-close" aria-label="Close"
-                            @click="deleteRecipe(recipe.id)"></button>
+                    <button type="button" class="btn btn-primary" aria-label="Close"
+                            @click="deleteRecipe(recipe.id)">Delete</button>
                     <br>
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                             @click="showModal('editRecipeModal', recipe.id)">Edit
