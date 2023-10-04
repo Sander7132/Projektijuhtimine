@@ -30,7 +30,7 @@ describe('Creating a user to be able to add books', () => {
         cy.wait(1500);
         cy.get('.recipe-card').should('contain', 'New Recipe');
         cy.wait(1500);
-        cy.get(':nth-child(2) > .btn').click({force: true});
+        cy.get(':nth-child(2) > [data-bs-toggle="modal"]').click({force: true});
         cy.wait(1000);
         cy.get('#editRecipeTitle').type('2');
         cy.wait(1000);
@@ -40,7 +40,7 @@ describe('Creating a user to be able to add books', () => {
         cy.wait(1500);
         cy.get('.recipe-card').should('contain', 'New Recipe2');
         cy.wait(1000);
-        cy.get(':nth-child(2) > .btn-close').click({force: true});
+        cy.get(':nth-child(2) > [aria-label="Close"]').click({force: true});
         cy.wait(1500);
         cy.get('.recipe-card').should('not.contain', 'New Recipe2');
         cy.wait(1000);
