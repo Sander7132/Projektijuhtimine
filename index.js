@@ -24,7 +24,7 @@ app.ws('/', function(ws) {
 });
 
 const users = [
-    {id: 1, email: 'admin', password: '$2b$10$NSGEJTcVuxP4Jb3yV0Fd8e4KCIXqqhf85Tu4txSuRi1Hd3iiEGvC2'} // admin123
+    {id: 1, email: 'admin', password: '$2b$10$NSGEJTcVuxP4Jb3yV0Fd8e4KCIXqqhf85Tu4txSuRi1Hd3iiEGvC2', username: 'Admin' } // admin123
 ]
 
 const recipes = [
@@ -68,9 +68,14 @@ function tryToParseJson(jsonString) {
 app.post('/users', async (req, res) => {
 
     // Validate email and password
-    if (!req.body.email || !req.body.password) return res.status(400).send('Email and password are required')
+    if (!req.body.email || !req.body.password || !req.body.username) return res.status(400).send('Username, email and password are required')
     if (req.body.password.length < 8) return res.status(400).send('Password must be at least 8 characters long')
     if (!req.body.email.match(/^[+a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/)) return res.status(400).send('Email must be in a valid format')
+
+    // Validate username
+    if (req.body.username.length < 3) return res.status(400).send('Username must be at least 3 characters long');
+    if (req.body.username.length > 20) return res.status(400).send('Username must be at most 20 characters long');
+    const username = req.body.username;
 
     // Check if email already exists
     if (users.find(user => user.email === req.body.email)) return res.status(409).send('Email already exists')
@@ -103,7 +108,7 @@ app.post('/users', async (req, res) => {
     const maxId = users.reduce((max, user) => user.id > max ? user.id : max, users[0].id)
 
     // Save user to database
-    users.push({id: maxId + 1, email: req.body.email, password: hashedPassword})
+    users.push({ id: maxId + 1, email: req.body.email, password: hashedPassword, username: username });
 
     res.status(201).end()
 })
@@ -123,7 +128,7 @@ app.post('/sessions', async (req, res) => {
         if (await bcrypt.compare(req.body.password, user.password)) {
 
             // Create session
-            const session = {id: uuidv4(), userId: user.id}
+            const session = {id: uuidv4(), userId: user.id, username: user.username };
 
             // Add session to sessions array
             sessions.push(session)

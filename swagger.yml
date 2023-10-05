@@ -24,6 +24,7 @@ paths:
                 value:
                   email: test.test@gmail.com
                   password: Passw0rd
+                  username: Test
         required: true
       tags:
         - /users
@@ -42,6 +43,10 @@ paths:
                   value: Email must be in a valid format
                 'Invalid email: {reason}':
                   value: 'Invalid email: {reason}'
+                Username must be at least 3 characters long:
+                  value: Username must be at least 3 characters long
+                Username must be at most 20 characters long:
+                  value: Username must be at most 20 characters long
           description: Client side error
         '409':
           content:
@@ -82,6 +87,7 @@ paths:
                   value:
                     id: 330d67de-432b-48ce-a617-0bd6774ebcee
                     userId: 1
+                    username: Admin
           description: Successful response.
         '400':
           content:

@@ -40,20 +40,36 @@
             background-color: #e9ecef;
         }
 
+        .name-card {
+            border-radius: 0.375rem;
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 6px 12px;
+            margin-left: 5px;
+            margin-top: 5px;
+            background-color: #0d6efd;
+            color: #fff;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+
         .recipe-card button {
             margin: 2px;
         }
 
-        
     </style>
 </head>
 <body>
 
 
-<div id="app">
+<div id="app" v-cloak>
 
     <!-- Page content-->
     <div class="container">
+        <div v-if="usernameCard" class="name-card">{{ username }}</div>
         <div class="text-center mt-5">
             <h1>Recipe Book</h1>
             <p class="lead">This is a simple RecipeBook app</p>
@@ -111,6 +127,12 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <div class="mb-3 row">
+                        <label for="signUpUsername" class="col-sm-2 col-form-label">Username</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="signUpUsername" v-model="signUpUsername" />
+                        </div>
+                    </div>
                     <div class="mb-3 row">
                         <label for="signUpEmail" class="col-sm-2 col-form-label">Email</label>
                         <div class="col-sm-10">
@@ -271,6 +293,9 @@
                 addRecipeContent: null,
                 editRecipeTitle: null,
                 editRecipeContent: null,
+                signUpUsername: null,
+                username: null,
+                usernameCard: false,
             };
         },
 
@@ -278,10 +303,15 @@
             // Check if the user is already logged in from local storage
             this.sessionId = localStorage.getItem('sessionId');
 
-            // If the user is logged in, get the recipes
+            // If the user is logged in, get the recipes and the username
             if (this.sessionId) {
+                // For recipes
                 this.getRecipesFromLocalStorage();
                 await this.getAndCacheRecipes();
+
+                // For username
+                this.username = localStorage.getItem('username');
+                this.usernameCard = true;
             }
         },
         methods: {
@@ -324,7 +354,7 @@
                             alert('Error code ' + response.status + ':\n' + responseText);
                         }
                         if (response.status === 401) {
-                            vue.clearStorageAndResetSessionId();
+                            vue.clearStorageAndResetSessionInfo();
                         }
                         return {ok: false, status: response.status, body: responseObject || responseText};
                     }
@@ -351,9 +381,10 @@
             },
             signUp: async function () {
                 // Send POST /users
+                const username = this.signUpUsername;
                 const email = this.signUpEmail;
                 const password = this.signUpPassword;
-                const response = await this.send('POST', '/users', {email, password});
+                const response = await this.send('POST', '/users', {username, email, password});
                 if (response.ok) {
                     alert('User created');
                     this.modalHandler.hide();
@@ -368,8 +399,15 @@
                     // Store the token in localStorage
                     localStorage.setItem('sessionId', response.body.id);
 
+                    // Store the username in localStorage
+                    localStorage.setItem('username', response.body.username);
+
                     // Sign in the user
                     this.sessionId = response.body.id;
+
+                    // Show the username card
+                    this.username = response.body.username;
+                    this.usernameCard = true;
 
                     // Close the modal
                     this.modalHandler.hide();
@@ -385,13 +423,16 @@
                 // Send DELETE /sessions
                 const response = await this.send('DELETE', '/sessions');
                 if (response.ok) {
-                    this.clearStorageAndResetSessionId();
+                    this.usernameCard = false;
+                    this.clearStorageAndResetSessionInfo();
                 }
             },
-            clearStorageAndResetSessionId: function () {
+            clearStorageAndResetSessionInfo: function () {
+                localStorage.removeItem('username');
                 localStorage.removeItem('sessionId');
                 this.sessionId = null;
                 this.recipes = null;
+                this.usernameCard = false;
             },
             addRecipe: function () {
                 // Validate the form
