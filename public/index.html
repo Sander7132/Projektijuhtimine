@@ -20,8 +20,15 @@
     <style>
         
         body {
-            background-color: #a9a9a9 ;
+            background-color: #a9a9a9;
+            padding-bottom: 50px;
         }
+
+        body::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+        }
+
         #recipe-list {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -34,6 +41,19 @@
             border: 1px solid #dee2e6;
             border-radius: .25rem;
             padding: 1rem;
+            max-width: 340px;
+            max-height: 200px;
+            overflow: hidden;
+            word-wrap: break-word;
+        }
+
+        .recipe-card button {
+            margin: 2px;
+        }
+
+        .recipe-card::-webkit-scrollbar {
+            width: 0;
+            height: 0;
         }
 
         .recipe-card:hover {
@@ -56,32 +76,11 @@
             display: none;
         }
 
-        .recipe-card button {
-            margin: 2px;
-        }
-
     </style>
 </head>
 <body>
 
-
 <div id="app" v-cloak>
-
-   <!-- Add a welcome message modal -->
-<div class="modal fade" id="welcomeModal" tabindex="-1" aria-labelledby="welcomeModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="welcomeModalLabel">Welcome!</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Welcome, {{username}} <span id="welcome-username"></span>! You are now logged in. </p>
-            </div>
-        </div>
-    </div>
-</div>
-
 
     <!-- Page content-->
     <div class="container">
@@ -117,6 +116,7 @@
                 </button>
             </div>
             &nbsp;
+
             <!-- List of recipes -->
             <div id="recipe-list">
                 <div v-for="recipe in recipes" class="recipe-card">
@@ -277,6 +277,21 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-danger" @click="deleteAllRecipes">Delete All</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Welcome message modal -->
+    <div class="modal fade" id="welcomeModal" tabindex="-1" aria-labelledby="welcomeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="welcomeModalLabel">Welcome!</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Welcome, {{username}}! <span id="welcome-username"></span>You are now logged in.</p>
                 </div>
             </div>
         </div>
