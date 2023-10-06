@@ -5,6 +5,8 @@ describe('Creating a user to be able to add books', () => {
     it('should sign up user with valid credentials', () => {
         cy.get('button').contains('Sign Up').click({force: true});
         cy.wait(1000);
+        cy.get('#signUpUsername').type('Test');
+        cy.wait(1000);
         cy.get('#signUpEmail').type('test.test@gmail.com');
         cy.wait(1000);
         cy.get('#signUpPassword').type('Passw0rd');
