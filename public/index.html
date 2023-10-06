@@ -67,6 +67,22 @@
 
 <div id="app" v-cloak>
 
+   <!-- Add a welcome message modal -->
+<div class="modal fade" id="welcomeModal" tabindex="-1" aria-labelledby="welcomeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="welcomeModalLabel">Welcome!</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Welcome, {{username}} <span id="welcome-username"></span>! You are now logged in. </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
     <!-- Page content-->
     <div class="container">
         <div v-if="usernameCard" class="name-card">{{ username }}</div>
@@ -409,8 +425,13 @@
                     this.username = response.body.username;
                     this.usernameCard = true;
 
+                    
                     // Close the modal
                     this.modalHandler.hide();
+
+                    // Show the welcome message modal
+                    const welcomeModal = new bootstrap.Modal(document.getElementById('welcomeModal'));
+                    welcomeModal.show();
 
                     // Get recipes from local storage
                     alert('Using outdated data from local storage.');
