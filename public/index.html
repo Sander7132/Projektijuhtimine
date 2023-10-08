@@ -18,7 +18,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
     <link rel="manifest" href="/icons/site.webmanifest">
     <style>
-        
+
         body {
             background-color: #a9a9a9;
             padding-bottom: 50px;
@@ -121,7 +121,8 @@
             <div id="recipe-list">
                 <div v-for="recipe in recipes" class="recipe-card">
                     <button type="button" class="btn btn-primary" aria-label="Close"
-                            @click="deleteRecipe(recipe.id)">Delete</button>
+                            @click="deleteRecipe(recipe.id)">Delete
+                    </button>
                     <br>
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                             @click="showModal('editRecipeModal', recipe.id)">Edit
@@ -135,18 +136,20 @@
     </div>
 
     <!-- Sign Up Modal -->
-    <div class="modal fade" id="signUpModal" tabindex="-1" aria-labelledby="signUpModalLabel" aria-hidden="true">
+    <div class="modal fade" id="signUpModal" tabindex="-1" aria-labelledby="signUpModalLabel" aria-hidden="true"
+         data-bs-backdrop="static">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="signUpModalLabel">Sign Up</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            @click="clearInputFields('signUp')"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3 row">
                         <label for="signUpUsername" class="col-sm-2 col-form-label">Username</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" id="signUpUsername" v-model="signUpUsername" />
+                            <input type="text" class="form-control" id="signUpUsername" v-model="signUpUsername"/>
                         </div>
                     </div>
                     <div class="mb-3 row">
@@ -163,7 +166,9 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            @click="clearInputFields('signUp')">Close
+                    </button>
                     <button type="button" class="btn btn-primary" @click="signUp">Sign Up</button>
                 </div>
             </div>
@@ -201,12 +206,14 @@
     </div>
 
     <!-- Add Recipe Modal -->
-    <div class="modal fade" id="addRecipeModal" tabindex="-1" aria-labelledby="addRecipeModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal fade" id="addRecipeModal" tabindex="-1" aria-labelledby="addRecipeModalLabel" aria-hidden="true"
+         data-bs-backdrop="static">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="addRecipeModalLabel">Add Recipe</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="clearInputFields('addRecipe')"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            @click="clearInputFields('addRecipe')"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3 row">
@@ -223,7 +230,9 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="clearInputFields('addRecipe')">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            @click="clearInputFields('addRecipe')">Close
+                    </button>
                     <button type="button" class="btn btn-primary" @click="addRecipe">Add Recipe</button>
                 </div>
             </div>
@@ -411,14 +420,47 @@
                     });
             },
             signUp: async function () {
+                // Validate the form
+                const username = this.signUpUsername ? this.signUpUsername.trim() : null;
+                const email = this.signUpEmail ? this.signUpEmail.trim() : null;
+                const password = this.signUpPassword ? this.signUpPassword.trim() : null;
+
+                if (!username || !email || !password) {
+                    // One or all fields are empty or contain only whitespace
+                    alert('Please enter a valid username, email and password');
+                    // Reset the invalid fields
+                    if (!username) {
+                        this.signUpUsername = null;
+                    }
+                    if (!email) {
+                        this.signUpEmail = null;
+                    }
+                    if (!password) {
+                        this.signUpPassword = null;
+                    }
+                    return;
+                }
                 // Send POST /users
-                const username = this.signUpUsername;
-                const email = this.signUpEmail;
-                const password = this.signUpPassword;
                 const response = await this.send('POST', '/users', {username, email, password});
                 if (response.ok) {
                     alert('User created');
+
+                    // Clear the input fields
+                    this.clearInputFields('signUp');
+
                     this.modalHandler.hide();
+                }
+                if (response.body === 'Username must be at least 3 characters long' || response.body === 'Username must be at most 20 characters long') {
+                    this.signUpUsername = null;
+                    return;
+                }
+                if (response.body === 'Email must be in a valid format' || response.body === 'Email already exists') {
+                    this.signUpEmail = null;
+                    return;
+                }
+                if (response.body === 'Password must be at least 8 characters long') {
+                    this.signUpPassword = null;
+                    return;
                 }
             },
             signIn: async function () {
@@ -440,7 +482,7 @@
                     this.username = response.body.username;
                     this.usernameCard = true;
 
-                    
+
                     // Close the modal
                     this.modalHandler.hide();
 
@@ -454,7 +496,8 @@
                     await this.getAndCacheRecipes();
                     alert('Recipes updated.');
                 }
-            },
+            }
+            ,
             signOut: async function () {
                 // Send DELETE /sessions
                 const response = await this.send('DELETE', '/sessions');
@@ -462,14 +505,16 @@
                     this.usernameCard = false;
                     this.clearStorageAndResetSessionInfo();
                 }
-            },
+            }
+            ,
             clearStorageAndResetSessionInfo: function () {
                 localStorage.removeItem('username');
                 localStorage.removeItem('sessionId');
                 this.sessionId = null;
                 this.recipes = null;
                 this.usernameCard = false;
-            },
+            }
+            ,
             addRecipe: function () {
                 // Validate the form
                 const trimmedTitle = this.addRecipeTitle ? this.addRecipeTitle.trim() : null;
@@ -498,7 +543,7 @@
                 // Send POST /recipes
                 const title = this.addRecipeTitle;
                 const content = this.addRecipeContent;
-                this.send('POST', '/recipes', { title, content }).then((response) => {
+                this.send('POST', '/recipes', {title, content}).then((response) => {
                     if (response.ok) {
                         this.getAndCacheRecipes();
                         alert('Recipe added');
@@ -511,7 +556,8 @@
                         this.modalHandler.hide();
                     }
                 });
-            },
+            }
+            ,
             deleteRecipe: function (recipeId) {
                 // Send DELETE /recipes/:id
                 this.send('DELETE', '/recipes/' + recipeId).then((response) => {
@@ -522,7 +568,8 @@
                         this.recipes = this.recipes.filter((recipe) => recipe.id !== recipeId);
                     }
                 });
-            },
+            }
+            ,
             deleteAllRecipes: function () {
                 // Send a request to delete all recipes
                 this.send('DELETE', '/recipes').then((response) => {
@@ -541,7 +588,8 @@
                         alert('Error deleting all recipes');
                     }
                 });
-            },
+            }
+            ,
             editRecipe: function (recipeId) {
                 // Validate the form
                 if (!this.editRecipeTitle.trim()) {
@@ -583,6 +631,11 @@
                     case 'addRecipe':
                         this.addRecipeTitle = null;
                         this.addRecipeContent = null;
+                        break;
+                    case 'signUp':
+                        this.signUpUsername = null;
+                        this.signUpEmail = null;
+                        this.signUpPassword = null;
                         break;
                     default:
                         break;

@@ -66,20 +66,20 @@ function tryToParseJson(jsonString) {
 }
 
 app.post('/users', async (req, res) => {
+// Check that all required fields are present
 
-    // Validate email and password
-    if (!req.body.email || !req.body.password || !req.body.username) return res.status(400).send('Username, email and password are required')
-    if (req.body.password.length < 8) return res.status(400).send('Password must be at least 8 characters long')
-    if (!req.body.email.match(/^[+a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/)) return res.status(400).send('Email must be in a valid format')
-
+    if (!req.body.email || !req.body.password || !req.body.username) return res.status(400).send('Username, email and password are required');
     // Validate username
     if (req.body.username.length < 3) return res.status(400).send('Username must be at least 3 characters long');
     if (req.body.username.length > 20) return res.status(400).send('Username must be at most 20 characters long');
     const username = req.body.username;
 
-    // Check if email already exists
-    if (users.find(user => user.email === req.body.email)) return res.status(409).send('Email already exists')
+    // Validate email and check if it already exists
+    if (!req.body.email.match(/^[+a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/)) return res.status(400).send('Email must be in a valid format');
+    if (users.find((user) => user.email === req.body.email)) return res.status(409).send('Email already exists');
 
+    // Validate password
+    if (req.body.password.length < 8) return res.status(400).send('Password must be at least 8 characters long');
     // Try to contact the mail server and send a test email without actually sending it
     try {
         const result = await verifyEmailDomain(req.body.email, {smtpNotRequired: process.env.EMAIL_VERIFY_SMTP_NOT_REQUIRED === 'true'})
