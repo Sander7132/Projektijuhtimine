@@ -176,12 +176,12 @@
     </div>
 
     <!-- Sign In Modal -->
-    <div class="modal fade" id="signInModal" tabindex="-1" aria-labelledby="signInModalLabel" aria-hidden="true">
+    <div class="modal fade" id="signInModal" tabindex="-1" aria-labelledby="signInModalLabel" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="signInModalLabel">Sign In</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h1 class="modal-title fs-5" id="signInModalLabel" @click="clearInputFields('signIn')">Sign In</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="clearInputFields('signIn')"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3 row">
@@ -198,8 +198,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" @click="signIn">Sign In</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="clearInputFields('signIn')">Close</button>
+                    <button type="button" class="btn btn-primary" @click="signIn" @click="clearInputFields('signIn')">Sign In</button>
                 </div>
             </div>
         </div>
@@ -465,9 +465,23 @@
             },
             signIn: async function () {
                 // Send POST /sessions
-                const email = this.signInEmail;
-                const password = this.signInPassword;
+                const email = this.signInEmail ? this.signInEmail.trim() : null;
+                const password = this.signInPassword ? this.signInPassword.trim() : null;
                 const response = await this.send('POST', '/sessions', {email, password});
+
+                if (!email || !password) {
+                    // One or all fields are empty or contain only whitespace
+                    alert('Please enter a valid username, email and password');
+                    // Reset the invalid fields
+                    if (!email) {
+                        this.signInEmail = null;
+                    }
+                    if (!password) {
+                        this.signInPassword = null;
+                    }
+                    return;
+                }
+                
                 if (response.ok) {
                     // Store the token in localStorage
                     localStorage.setItem('sessionId', response.body.id);
@@ -482,6 +496,8 @@
                     this.username = response.body.username;
                     this.usernameCard = true;
 
+                    // Clear the input fields
+                    this.clearInputFields('signIn');
 
                     // Close the modal
                     this.modalHandler.hide();
@@ -495,6 +511,15 @@
                     this.getRecipesFromLocalStorage();
                     await this.getAndCacheRecipes();
                     alert('Recipes updated.');
+                }
+
+                if (response.body === 'User not found') {
+                    this.signInEmail = null;
+                    return;
+                }
+                if (response.body === 'Invalid password') {
+                    this.signInPassword = null;
+                    return;
                 }
             }
             ,
@@ -636,6 +661,10 @@
                         this.signUpUsername = null;
                         this.signUpEmail = null;
                         this.signUpPassword = null;
+                        break;
+                    case 'signIn':
+                        this.signInEmail = null;
+                        this.signInPassword = null;
                         break;
                     default:
                         break;
