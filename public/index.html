@@ -48,7 +48,8 @@
         }
 
         .recipe-card button {
-            margin: 2px;
+            width: 72px;
+            margin-right: 5px;
         }
 
         .recipe-card::-webkit-scrollbar {
@@ -58,6 +59,11 @@
 
         .recipe-card:hover {
             background-color: #e9ecef;
+        }
+
+        .recipe-buttons-row {
+            margin-top: 1px;
+            margin-left: 0;
         }
 
         .name-card {
@@ -120,13 +126,12 @@
             <!-- List of recipes -->
             <div id="recipe-list">
                 <div v-for="recipe in recipes" class="recipe-card">
-                    <button type="button" class="btn btn-primary" aria-label="Close"
-                            @click="deleteRecipe(recipe.id)">Delete
-                    </button>
-                    <br>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                            @click="showModal('editRecipeModal', recipe.id)">Edit
-                    </button>
+                    <div class="row recipe-buttons-row">
+                        <button type="button" class="btn btn-primary" @click="deleteRecipe(recipe.id)">Delete</button>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                @click="showModal('editRecipeModal', recipe.id)">Edit
+                        </button>
+                    </div>
                     <br>
                     {{ recipe.title }}<br>
                     {{ recipe.content }}
@@ -176,12 +181,14 @@
     </div>
 
     <!-- Sign In Modal -->
-    <div class="modal fade" id="signInModal" tabindex="-1" aria-labelledby="signInModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal fade" id="signInModal" tabindex="-1" aria-labelledby="signInModalLabel" aria-hidden="true"
+         data-bs-backdrop="static">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="signInModalLabel" @click="clearInputFields('signIn')">Sign In</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="clearInputFields('signIn')"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            @click="clearInputFields('signIn')"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3 row">
@@ -198,8 +205,13 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="clearInputFields('signIn')">Close</button>
-                    <button type="button" class="btn btn-primary" @click="signIn" @click="clearInputFields('signIn')">Sign In</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            @click="clearInputFields('signIn')">Close
+                    </button>
+                    <button type="button" class="btn btn-primary" @click="signIn" @click="clearInputFields('signIn')">
+                        Sign
+                        In
+                    </button>
                 </div>
             </div>
         </div>
@@ -300,7 +312,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Welcome, {{username}}! <span id="welcome-username"></span>You are now logged in.</p>
+                    <p>Welcome, {{ username }}! <span id="welcome-username"></span>You are now logged in.</p>
                 </div>
             </div>
         </div>
@@ -335,7 +347,7 @@
                 editRecipeContent: null,
                 signUpUsername: null,
                 username: null,
-                usernameCard: false,
+                usernameCard: false
             };
         },
 
@@ -481,7 +493,7 @@
                     }
                     return;
                 }
-                
+
                 if (response.ok) {
                     // Store the token in localStorage
                     localStorage.setItem('sessionId', response.body.id);
