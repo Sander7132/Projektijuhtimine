@@ -519,7 +519,6 @@
                     welcomeModal.show();
 
                     // Get recipes from local storage
-                    alert('Using outdated data from local storage.');
                     this.getRecipesFromLocalStorage();
                     await this.getAndCacheRecipes();
                     alert('Recipes updated.');
@@ -583,7 +582,7 @@
                 this.send('POST', '/recipes', {title, content}).then((response) => {
                     if (response.ok) {
                         this.getAndCacheRecipes();
-                        alert('Recipe added');
+
 
                         this.recipes.push(response.body);
 
@@ -600,7 +599,6 @@
                 this.send('DELETE', '/recipes/' + recipeId).then((response) => {
                     if (response.ok) {
                         this.getAndCacheRecipes();
-                        alert('Recipe deleted');
 
                         this.recipes = this.recipes.filter((recipe) => recipe.id !== recipeId);
                     }
@@ -620,7 +618,6 @@
                         // Close the modal
                         this.modalHandler.hide();
 
-                        alert('All recipes have been deleted.');
                     } else {
                         alert('Error deleting all recipes');
                     }
@@ -649,7 +646,6 @@
                 this.send('PUT', '/recipes/' + recipeId, {title, content}).then((response) => {
                     if (response.ok) {
                         this.getAndCacheRecipes();
-                        alert('Recipe edited');
 
                         this.recipes = this.recipes.map((recipe) => {
                             if (recipe.id === recipeId) {
