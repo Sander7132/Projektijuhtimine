@@ -166,7 +166,7 @@
                     <div class="mb-3 row">
                         <label for="signUpPassword"><b>Password</b></label>
                         <div class="col-sm-10">
-                            <input placeholder="Secure password (letters, numbers, symbols)" class="form-control" id="signUpPassword" v-model="signUpPassword">
+                            <input type="password"placeholder="Secure password (letters, numbers, symbols)" class="form-control" id="signUpPassword" v-model="signUpPassword">
                         </div>
                     </div>
                 </div>
@@ -231,13 +231,13 @@
                     <div class="mb-3 row">
                         <label for="addRecipeTitle" class="col-sm-12 col-form-label">Title</label>
                         <div class="col-sm-12">
-                            <input type="text" class="form-control" id="addRecipeTitle" v-model="addRecipeTitle">
+                            <input placeholder="Recipe Name (e.g., Spaghetti Bolognese)" class="form-control" id="addRecipeTitle" v-model="addRecipeTitle">
                         </div>
                     </div>
                     <div class="mb-3 row">
                         <label for="addRecipeContent" class="col-sm-12 col-form-label">Content</label>
                         <div class="col-sm-12">
-                            <textarea class="form-control" id="addRecipeContent" v-model="addRecipeContent"></textarea>
+                            <textarea placeholder="Include Key Ingredients and Preparation" class="form-control" id="addRecipeContent" v-model="addRecipeContent"></textarea>
                         </div>
                     </div>
                 </div>
