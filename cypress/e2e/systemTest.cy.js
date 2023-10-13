@@ -14,6 +14,7 @@ describe('Creating a user to be able to add books', () => {
         cy.get('#signUpModal > .modal-dialog > .modal-content > .modal-footer > .btn-primary').click({force: true});
     });
     it('should log in a user perform different tasks with recipes and sign out', () => {
+        cy.wait(1000);
         cy.get('button').contains('Sign In').click({force: true});
         cy.wait(1000);
         cy.get('#signInEmail').type('test.test@gmail.com');
@@ -23,7 +24,7 @@ describe('Creating a user to be able to add books', () => {
         cy.get('#signInModal > .modal-dialog > .modal-content > .modal-footer > .btn-primary').click({force: true});
         cy.wait(1500);
         cy.get('button').contains('Add Recipe').click({force: true});
-        cy.wait(1000);
+        cy.wait(2000);
         cy.get('#addRecipeTitle').type('New Recipe');
         cy.wait(1000);
         cy.get('#addRecipeContent').type('Recipe content');
@@ -32,7 +33,7 @@ describe('Creating a user to be able to add books', () => {
         cy.wait(1500);
         cy.get('.recipe-card').should('contain', 'New Recipe');
         cy.wait(1500);
-        cy.get('#recipe-list > :nth-child(2) > .row > [data-bs-toggle="modal"]').click({ force: true });
+        cy.get('#recipe-list > div:nth-child(2) > div > button.btn.btn-primary').click({ force: true });
         cy.get('#editRecipeTitle').type('2');
         cy.wait(1000);
         cy.get('#editRecipeContent').type('2');
@@ -41,7 +42,8 @@ describe('Creating a user to be able to add books', () => {
         cy.wait(1500);
         cy.get('.recipe-card').should('contain', 'New Recipe2');
         cy.wait(1000);
-        cy.get('#recipe-list > :nth-child(2) > .row > :nth-child(1)').click({ force: true });
+        cy.get('#recipe-list > div:nth-child(2) > div > button.btn.btn-danger.border.border-dark.col').click({ force: true });
+        cy.get('#deleteARecipeModal > div > div > div.modal-footer > button.btn.btn-danger').click({force: true});
         cy.get('.recipe-card').should('not.contain', 'New Recipe2');
         cy.wait(1000);
         cy.get('button').contains('Sign Out').click({force: true});
