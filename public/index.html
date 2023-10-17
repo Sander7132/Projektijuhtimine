@@ -102,6 +102,7 @@
                     Sign Out
                 </button>
                 &nbsp;
+
             </div>
             <div class="row">
                 <button type="button" class="btn btn-primary col" data-bs-toggle="modal" v-if="sessionId"
@@ -123,10 +124,10 @@
                     <div class="row recipe-buttons-row">
 
                         <button type="button" class="btn btn-danger border border-dark col" data-bs-toggle="modal"
-                            v-if="sessionId"
-                            @click="showModal('deleteARecipeModal', recipe.id)">
+                                v-if="sessionId"
+                                @click="showModal('deleteARecipeModal', recipe.id)">
                             Delete
-                        </button>                        
+                        </button>
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                 @click="showModal('editRecipeModal', recipe.id)">Edit
                         </button>
@@ -153,19 +154,22 @@
                     <div class="mb-3 row">
                         <label for="signUpUsername"><b>Username</b></label>
                         <div class="col-sm-10">
-                            <input placeholder="Choose a unique username" type="text" class="form-control" id="signUpUsername" v-model="signUpUsername"/>
+                            <input placeholder="Choose a unique username" type="text" class="form-control"
+                                   id="signUpUsername" v-model="signUpUsername"/>
                         </div>
                     </div>
                     <div class="mb-3 row">
                         <label for="signUpEmail"><b>Email</b></label>
                         <div class="col-sm-10">
-                            <input placeholder="Email (example: yourname@example.com)" class="form-control" id="signUpEmail" v-model="signUpEmail">
+                            <input placeholder="Email (example: yourname@example.com)" class="form-control"
+                                   id="signUpEmail" v-model="signUpEmail">
                         </div>
                     </div>
                     <div class="mb-3 row">
                         <label for="signUpPassword"><b>Password</b></label>
                         <div class="col-sm-10">
-                            <input type="password"placeholder="Secure password (letters, numbers, symbols)" class="form-control" id="signUpPassword" v-model="signUpPassword">
+                            <input type="password" placeholder="Secure password (letters, numbers, symbols)"
+                                   class="form-control" id="signUpPassword" v-model="signUpPassword">
                         </div>
                     </div>
                 </div>
@@ -193,13 +197,15 @@
                     <div class="mb-3 row">
                         <label for="signInEmail" class="col-sm-12 col-form-label">Email</label>
                         <div class="col-sm-12">
-                            <input type="text" class="form-control" id="signInEmail" placeholder="example@gmail.com" v-model="signInEmail" />
+                            <input type="text" class="form-control" id="signInEmail" placeholder="example@gmail.com"
+                                   v-model="signInEmail"/>
                         </div>
                     </div>
                     <div class="mb-3 row">
                         <label for="signInPassword" class="col-sm-12 col-form-label">Password</label>
                         <div class="col-sm-12">
-                            <input type="password" class="form-control" id="signInPassword" placeholder="Password" v-model="signInPassword" />
+                            <input type="password" class="form-control" id="signInPassword" placeholder="Password"
+                                   v-model="signInPassword"/>
                         </div>
                     </div>
                 </div>
@@ -230,13 +236,15 @@
                     <div class="mb-3 row">
                         <label for="addRecipeTitle" class="col-sm-12 col-form-label">Title</label>
                         <div class="col-sm-12">
-                            <input placeholder="Recipe Name (e.g., Spaghetti Bolognese)" class="form-control" id="addRecipeTitle" v-model="addRecipeTitle">
+                            <input placeholder="Recipe Name (e.g., Spaghetti Bolognese)" class="form-control"
+                                   id="addRecipeTitle" v-model="addRecipeTitle">
                         </div>
                     </div>
                     <div class="mb-3 row">
                         <label for="addRecipeContent" class="col-sm-12 col-form-label">Content</label>
                         <div class="col-sm-12">
-                            <textarea placeholder="Include Key Ingredients and Preparation" class="form-control" id="addRecipeContent" v-model="addRecipeContent"></textarea>
+                            <textarea placeholder="Include Key Ingredients and Preparation" class="form-control"
+                                      id="addRecipeContent" v-model="addRecipeContent"></textarea>
                         </div>
                     </div>
                 </div>
@@ -316,12 +324,28 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="deleteRecipe(recipe.id)">Confirm</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal"
+                            @click="deleteRecipe(recipe.id)">Confirm
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- SignOut message modal -->
+    <div class="modal fade" id="signOutModal" tabindex="-1" aria-labelledby="signOutModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="signOutModalLabel">Goodbye!</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="signOutModal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Goodbye, {{ username }}! <span id="signOut-username"></span>You are now logged out.</p>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Welcome message modal -->
     <div class="modal fade" id="welcomeModal" tabindex="-1" aria-labelledby="welcomeModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -537,6 +561,10 @@
                     const welcomeModal = new bootstrap.Modal(document.getElementById('welcomeModal'));
                     welcomeModal.show();
 
+                    // Show the signOut message modal
+                    const signOutModal = new bootstrap.Modal(document.getElementById('signOutModal'));
+                    signOutModal.show();
+
                     // Get recipes from local storage
                     this.getRecipesFromLocalStorage();
                     await this.getAndCacheRecipes();
@@ -551,17 +579,17 @@
                     this.signInPassword = null;
                     return;
                 }
-            }
-            ,
+            },
             signOut: async function () {
                 // Send DELETE /sessions
                 const response = await this.send('DELETE', '/sessions');
                 if (response.ok) {
                     this.usernameCard = false;
+                    this.showModal('signOutModal');
                     this.clearStorageAndResetSessionInfo();
                 }
-            }
-            ,
+            },
+
             clearStorageAndResetSessionInfo: function () {
                 localStorage.removeItem('username');
                 localStorage.removeItem('sessionId');
