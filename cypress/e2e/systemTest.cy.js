@@ -12,6 +12,7 @@ describe('Creating a user to be able to add books', () => {
         cy.get('#signUpPassword').type('Passw0rd');
         cy.wait(1000);
         cy.get('#signUpModal > .modal-dialog > .modal-content > .modal-footer > .btn-primary').click({force: true});
+        cy.wait(1000);
     });
     it('should log in a user perform different tasks with recipes and sign out', () => {
         cy.wait(1000);
@@ -42,10 +43,12 @@ describe('Creating a user to be able to add books', () => {
         cy.wait(1500);
         cy.get('.recipe-card').should('contain', 'New Recipe2');
         cy.wait(1000);
-        cy.get('#recipe-list > div:nth-child(2) > div > button.btn.btn-danger.border.border-dark.col').click({ force: true });
-        cy.get('#deleteARecipeModal > div > div > div.modal-footer > button.btn.btn-danger').click({force: true});
+        cy.get(':nth-child(2) > .recipe-buttons-row > :nth-child(1)').click({ force: true });
+        cy.wait(100);
+        cy.get('#deleteARecipeModal > .modal-dialog > .modal-content > .modal-footer > .btn-danger').click({ force: true });
+        cy.wait(1500);
         cy.get('.recipe-card').should('not.contain', 'New Recipe2');
         cy.wait(1000);
-        cy.get('button').contains('Sign Out').click({force: true});
+        cy.get('button').contains('Sign Out').click({ force: true });
     });
 });

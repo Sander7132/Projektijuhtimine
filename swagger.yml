@@ -170,6 +170,7 @@ paths:
                       id: 3
                       title: Title
                       content: Content
+                      category: Dinner
                       userId: 1
           description: Successful response - returns an array of `Recipes` entities.
         '400':
@@ -205,6 +206,7 @@ paths:
             examples:
               Recipe:
                 value:
+                  category: Dinner
                   content: some text
                   title: some text
         required: true
@@ -220,6 +222,7 @@ paths:
                     id: 3
                     title: Title
                     content: Content
+                    category: Dinner
                     userId: 1
           description: Successful response.
         '400':
@@ -290,6 +293,7 @@ paths:
             examples:
               Recipe:
                 value:
+                  category: Dinner
                   content: some text
                   title: some text
         required: true
@@ -313,6 +317,7 @@ paths:
                     id: 1
                     title: some text
                     content: some text
+                    category: Dinner
                     userId: 1
           description: OK
         '400':
@@ -464,8 +469,11 @@ components:
         userId:
           format: int32
           type: integer
+        category:
+            type: string
       example:
         content: This is the content of example recipe 1
+        category: Dinner
         id: 1
         title: Example 1
         userId: 1

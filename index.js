@@ -194,7 +194,7 @@ app.post('/recipes', authorizeRequest, (req, res) => {
     const maxId = recipes.reduce((max, recipe) => recipe.id > max ? recipe.id : max, 0)
 
     // Save recipe to database
-    const recipe = {id: maxId + 1, title: req.body.title, content: req.body.content, userId: req.user.id}
+    const recipe = {id: maxId + 1, title: req.body.title, content: req.body.content, category: req.body.category, userId: req.user.id}
 
     // Add recipe to recipes array
     recipes.push(recipe)
@@ -240,6 +240,7 @@ app.put('/recipes/:id', authorizeRequest, (req, res) => {
     // Update recipe
     recipe.title = req.body.title
     recipe.content = req.body.content
+    recipe.category = req.body.category
 
     // Send update event to clients
     expressWs.getWss().clients.forEach(client => client.send(JSON.stringify({event: 'update', recipe})));
