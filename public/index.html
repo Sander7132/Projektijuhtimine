@@ -5,20 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
     <meta name="description" content="RecipeBook"/>
     <meta name="author" content="Johannes Gross"/>
-
     <title>RecipeBook</title>
-
     <!-- Core theme CSS (includes Bootstrap)-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
           integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-
     <!-- Favicon -->
     <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
     <link rel="manifest" href="/icons/site.webmanifest">
     <style>
-
         body {
             padding-bottom: 50px;
         }
@@ -79,9 +75,7 @@
     </style>
 </head>
 <body>
-
 <div id="app" v-cloak>
-
     <!-- Page content-->
     <div class="container">
         <div v-if="usernameCard" class="name-card">{{ username }}</div>
@@ -116,17 +110,16 @@
                 </button>
             </div>
             &nbsp;
-
             <!-- List of recipes -->
             <div id="recipe-list">
                 <div v-for="recipe in recipes" class="recipe-card">
                     <div class="row recipe-buttons-row">
 
                         <button type="button" class="btn btn-danger border border-dark col" data-bs-toggle="modal"
-                            v-if="sessionId"
-                            @click="showModal('deleteARecipeModal', recipe.id)">
+                                v-if="sessionId"
+                                @click="showModal('deleteARecipeModal', recipe.id)">
                             Delete
-                        </button>                        
+                        </button>
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                 @click="showModal('editRecipeModal', recipe.id)">Edit
                         </button>
@@ -138,7 +131,6 @@
             </div>
         </div>
     </div>
-
     <!-- Sign Up Modal -->
     <div class="modal fade" id="signUpModal" tabindex="-1" aria-labelledby="signUpModalLabel" aria-hidden="true"
          data-bs-backdrop="static">
@@ -170,15 +162,13 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                            @click="clearInputFields('signUp')">Close
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="clearInputFields('signUp')">Close
                     </button>
                     <button type="button" class="btn btn-primary" @click="signUp">Sign Up</button>
                 </div>
             </div>
         </div>
     </div>
-
     <!-- Sign In Modal -->
     <div class="modal fade" id="signInModal" tabindex="-1" aria-labelledby="signInModalLabel" aria-hidden="true"
          data-bs-backdrop="static">
@@ -215,7 +205,6 @@
             </div>
         </div>
     </div>
-
     <!-- Add Recipe Modal -->
     <div class="modal fade" id="addRecipeModal" tabindex="-1" aria-labelledby="addRecipeModalLabel" aria-hidden="true"
          data-bs-backdrop="static">
@@ -249,7 +238,6 @@
             </div>
         </div>
     </div>
-
     <!-- Edit Recipe Modal -->
     <div class="modal fade" id="editRecipeModal" tabindex="-1" aria-labelledby="editRecipeModalLabel"
          aria-hidden="true" data-bs-backdrop="static">
@@ -281,7 +269,6 @@
             </div>
         </div>
     </div>
-
     <!-- Delete All Recipes Modal -->
     <div class="modal fade" id="deleteRecipeModal" tabindex="-1" aria-labelledby="deleteRecipeModalLabel"
          aria-hidden="true" data-bs-backdrop="static">
@@ -301,7 +288,6 @@
             </div>
         </div>
     </div>
-
     <!-- Delete A Recipe Modal -->
     <div class="modal fade" id="deleteARecipeModal" tabindex="-1" aria-labelledby="deleteARecipeModalLabel"
          aria-hidden="true" data-bs-backdrop="static">
@@ -322,6 +308,20 @@
         </div>
     </div>
 
+    <!-- SignOut message modal -->
+    <div class="modal fade" id="signOutModal" tabindex="-1" aria-labelledby="signOutModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="signOutModalLabel">Goodbye!</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Goodbye, {{ username }}! <span id="signOut-username"></span>You are now logged out.</p>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Welcome message modal -->
     <div class="modal fade" id="welcomeModal" tabindex="-1" aria-labelledby="welcomeModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -369,17 +369,14 @@
                 usernameCard: false
             };
         },
-
         async mounted() {
             // Check if the user is already logged in from local storage
             this.sessionId = localStorage.getItem('sessionId');
-
             // If the user is logged in, get the recipes and the username
             if (this.sessionId) {
                 // For recipes
                 this.getRecipesFromLocalStorage();
                 await this.getAndCacheRecipes();
-
                 // For username
                 this.username = localStorage.getItem('username');
                 this.usernameCard = true;
@@ -455,7 +452,6 @@
                 const username = this.signUpUsername ? this.signUpUsername.trim() : null;
                 const email = this.signUpEmail ? this.signUpEmail.trim() : null;
                 const password = this.signUpPassword ? this.signUpPassword.trim() : null;
-
                 if (!username || !email || !password) {
                     // One or all fields are empty or contain only whitespace
                     alert('Please enter a valid username, email and password');
@@ -475,10 +471,8 @@
                 const response = await this.send('POST', '/users', {username, email, password});
                 if (response.ok) {
                     alert('User created');
-
                     // Clear the input fields
                     this.clearInputFields('signUp');
-
                     this.modalHandler.hide();
                 }
                 if (response.body === 'Username must be at least 3 characters long' || response.body === 'Username must be at most 20 characters long') {
@@ -499,7 +493,6 @@
                 const email = this.signInEmail ? this.signInEmail.trim() : null;
                 const password = this.signInPassword ? this.signInPassword.trim() : null;
                 const response = await this.send('POST', '/sessions', {email, password});
-
                 if (!email || !password) {
                     // One or all fields are empty or contain only whitespace
                     alert('Please enter a valid username, email and password');
@@ -512,27 +505,20 @@
                     }
                     return;
                 }
-
                 if (response.ok) {
                     // Store the token in localStorage
                     localStorage.setItem('sessionId', response.body.id);
-
                     // Store the username in localStorage
                     localStorage.setItem('username', response.body.username);
-
                     // Sign in the user
                     this.sessionId = response.body.id;
-
                     // Show the username card
                     this.username = response.body.username;
                     this.usernameCard = true;
-
                     // Clear the input fields
                     this.clearInputFields('signIn');
-
                     // Close the modal
                     this.modalHandler.hide();
-
                     // Show the welcome message modal
                     const welcomeModal = new bootstrap.Modal(document.getElementById('welcomeModal'));
                     welcomeModal.show();
@@ -542,7 +528,6 @@
                     await this.getAndCacheRecipes();
                     alert('Recipes updated.');
                 }
-
                 if (response.body === 'User not found') {
                     this.signInEmail = null;
                     return;
@@ -551,17 +536,17 @@
                     this.signInPassword = null;
                     return;
                 }
-            }
-            ,
+            },
             signOut: async function () {
                 // Send DELETE /sessions
                 const response = await this.send('DELETE', '/sessions');
                 if (response.ok) {
                     this.usernameCard = false;
+                    this.showModal('signOutModal');
                     this.clearStorageAndResetSessionInfo();
                 }
-            }
-            ,
+            },
+
             clearStorageAndResetSessionInfo: function () {
                 localStorage.removeItem('username');
                 localStorage.removeItem('sessionId');
@@ -574,7 +559,6 @@
                 // Validate the form
                 const trimmedTitle = this.addRecipeTitle ? this.addRecipeTitle.trim() : null;
                 const trimmedContent = this.addRecipeContent ? this.addRecipeContent.trim() : null;
-
                 if (!trimmedTitle || !trimmedContent) {
                     // One or both fields are empty or contain only whitespace
                     alert('Please enter a valid title and content');
@@ -587,27 +571,21 @@
                     }
                     return;
                 }
-
                 // Validate that content string is not too long
                 if (trimmedContent.length > 1000) {
                     alert('Content is too long');
                     this.addRecipeContent = null;
                     return;
                 }
-
                 // Send POST /recipes
                 const title = this.addRecipeTitle;
                 const content = this.addRecipeContent;
                 this.send('POST', '/recipes', {title, content}).then((response) => {
                     if (response.ok) {
                         this.getAndCacheRecipes();
-
-
                         this.recipes.push(response.body);
-
                         // Clear the input fields
                         this.clearInputFields('addRecipe');
-
                         this.modalHandler.hide();
                     }
                 });
@@ -618,7 +596,6 @@
                 this.send('DELETE', '/recipes/' + recipeId).then((response) => {
                     if (response.ok) {
                         this.getAndCacheRecipes();
-
                         this.recipes = this.recipes.filter((recipe) => recipe.id !== recipeId);
                     }
                 });
@@ -630,13 +607,10 @@
                     if (response.ok) {
                         // Clear the recipes array
                         this.recipes = [];
-
                         // Clear the local storage
                         this.getAndCacheRecipes();
-
                         // Close the modal
                         this.modalHandler.hide();
-
                     } else {
                         alert('Error deleting all recipes');
                     }
@@ -658,14 +632,12 @@
                     alert('Content is too long');
                     return;
                 }
-
                 //Send PUT /recipes/:id
                 const title = this.editRecipeTitle;
                 const content = this.editRecipeContent;
                 this.send('PUT', '/recipes/' + recipeId, {title, content}).then((response) => {
                     if (response.ok) {
                         this.getAndCacheRecipes();
-
                         this.recipes = this.recipes.map((recipe) => {
                             if (recipe.id === recipeId) {
                                 return response.body;
@@ -699,14 +671,12 @@
             },
         },
     }).mount('#app');
-
     // Connect to WebSocket
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const connection = new WebSocket(protocol + '//' + window.location.hostname + (window.location.port ? ':' + window.location.port : ''));
     connection.onmessage = function (message) {
         // Run method based on message's event
         message = tryToParseJSON(message.data);
-
         switch (message.event) {
             case 'create':
                 vue.recipes.push(message.recipe);
@@ -729,7 +699,6 @@
         }
     };
 </script>
-
 <!-- Bootstrap core JS-->
 <script
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"
