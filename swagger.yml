@@ -171,6 +171,7 @@ paths:
                       title: Title
                       content: Content
                       category: Dinner
+                      difficulty: Easy
                       cookingTime: 30
                       userId: 1
           description: Successful response - returns an array of `Recipes` entities.
@@ -208,6 +209,7 @@ paths:
               Recipe:
                 value:
                   category: Dinner
+                  difficulty: Easy
                   cookingTime: 30
                   content: some text
                   title: some text
@@ -225,6 +227,7 @@ paths:
                     title: Title
                     content: Content
                     category: Dinner
+                    difficulty: Easy
                     cookingTime: 30
                     userId: 1
           description: Successful response.
@@ -297,6 +300,7 @@ paths:
               Recipe:
                 value:
                   category: Dinner
+                  difficulty: Easy
                   cookingTime: 30
                   content: some text
                   title: some text
@@ -322,6 +326,7 @@ paths:
                     title: some text
                     content: some text
                     category: Dinner
+                    difficulty: Easy
                     cookingTime: 30
                     userId: 1
           description: OK
@@ -476,12 +481,15 @@ components:
           type: integer
         category:
             type: string
+        difficulty:
+            type: string
         cookingTime:
             format: int32
             type: integer
       example:
         content: This is the content of example recipe 1
         category: Dinner
+        difficulty: Easy
         cookingTime: 30
         id: 1
         title: Example 1

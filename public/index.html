@@ -87,6 +87,11 @@
             user-select: none;
         }
 
+        .difficultyDropdown {
+            cursor: pointer;
+            user-select: none;
+        }
+
         .recipe-title-row {
             margin-top: 8px;
             margin-left: 0;
@@ -163,6 +168,7 @@
                     </div>
                     <div class="row recipe-details-row">
                         <div class="recipe-details" v-if="recipe.category">{{ recipe.category }}</div>
+                        <div class="recipe-details" v-if="recipe.difficulty">{{ recipe.difficulty}}</div>
                         <div class="recipe-details" v-if="recipe.cookingTime">{{ recipe.cookingTime }} min</div>
                     </div>
                     <div class="row recipe-title-row">
@@ -189,24 +195,28 @@
                     <div class="mb-3 row">
                         <label for="signUpUsername"><b>Username</b></label>
                         <div class="col-sm-10">
-                            <input placeholder="Choose a unique username" type="text" class="form-control" id="signUpUsername" v-model="signUpUsername"/>
+                            <input placeholder="Choose a unique username" type="text" class="form-control"
+                                   id="signUpUsername" v-model="signUpUsername"/>
                         </div>
                     </div>
                     <div class="mb-3 row">
                         <label for="signUpEmail"><b>Email</b></label>
                         <div class="col-sm-10">
-                            <input placeholder="Email (example: yourname@example.com)" class="form-control" id="signUpEmail" v-model="signUpEmail">
+                            <input placeholder="Email (example: yourname@example.com)" class="form-control"
+                                   id="signUpEmail" v-model="signUpEmail">
                         </div>
                     </div>
                     <div class="mb-3 row">
                         <label for="signUpPassword"><b>Password</b></label>
                         <div class="col-sm-10">
-                            <input type="password"placeholder="Secure password (letters, numbers, symbols)" class="form-control" id="signUpPassword" v-model="signUpPassword">
+                            <input type="password" placeholder="Secure password (letters, numbers, symbols)"
+                                   class="form-control" id="signUpPassword" v-model="signUpPassword">
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="clearInputFields('signUp')">Close
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            @click="clearInputFields('signUp')">Close
                     </button>
                     <button type="button" class="btn btn-primary" @click="signUp">Sign Up</button>
                 </div>
@@ -227,13 +237,15 @@
                     <div class="mb-3 row">
                         <label for="signInEmail" class="col-sm-12 col-form-label">Email</label>
                         <div class="col-sm-12">
-                            <input type="text" class="form-control" id="signInEmail" placeholder="example@gmail.com" v-model="signInEmail" />
+                            <input type="text" class="form-control" id="signInEmail" placeholder="example@gmail.com"
+                                   v-model="signInEmail"/>
                         </div>
                     </div>
                     <div class="mb-3 row">
                         <label for="signInPassword" class="col-sm-12 col-form-label">Password</label>
                         <div class="col-sm-12">
-                            <input type="password" class="form-control" id="signInPassword" placeholder="Password" v-model="signInPassword" />
+                            <input type="password" class="form-control" id="signInPassword" placeholder="Password"
+                                   v-model="signInPassword"/>
                         </div>
                     </div>
                 </div>
@@ -263,19 +275,22 @@
                     <div class="mb-3 row">
                         <label for="addRecipeTitle" class="col-sm-12 col-form-label">Title</label>
                         <div class="col-sm-12">
-                            <input placeholder="Recipe Name (e.g., Spaghetti Bolognese)" class="form-control" id="addRecipeTitle" v-model="addRecipeTitle">
+                            <input placeholder="Recipe Name (e.g., Spaghetti Bolognese)" class="form-control"
+                                   id="addRecipeTitle" v-model="addRecipeTitle">
                         </div>
                     </div>
                     <div class="mb-3 row">
                         <label for="addRecipeContent" class="col-sm-12 col-form-label">Content</label>
                         <div class="col-sm-12">
-                            <textarea placeholder="Include Key Ingredients and Preparation" class="form-control" id="addRecipeContent" v-model="addRecipeContent"></textarea>
+                            <textarea placeholder="Include Key Ingredients and Preparation" class="form-control"
+                                      id="addRecipeContent" v-model="addRecipeContent"></textarea>
                         </div>
                     </div>
                     <div class="mb-3 row">
                         <label for="addRecipeCategory" class="col-sm-12 col-form-label">Category</label>
                         <div class="dropdown">
-                            <button class="btn btn-primary dropdown-toggle categoryButton" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <button class="btn btn-primary dropdown-toggle categoryButton" type="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
                                 {{ addRecipeCategory ? addRecipeCategory : 'Choose Category' }}
                             </button>
                             <ul class="dropdown-menu">
@@ -283,7 +298,26 @@
                                     <a class="dropdown-item categoryDropdown" @click="addRecipeCategory = null">None</a>
                                 </li>
                                 <li v-for="category in categories" :key="category">
-                                    <a class="dropdown-item categoryDropdown" @click="addRecipeCategory = category">{{ category }}</a>
+                                    <a class="dropdown-item categoryDropdown"
+                                       @click="addRecipeCategory = category">{{ category }}</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="addRecipeDifficulty" class="col-sm-12 col-form-label">Difficulty</label>
+                        <div class="dropdown">
+                            <button class="btn btn-primary dropdown-toggle difficultyButton" type="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                {{ addRecipeDifficulty ? addRecipeDifficulty : 'Choose Difficulty' }}
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item difficultyDropdown" @click="addRecipeDifficulty = null">None</a>
+                                </li>
+                                <li v-for="difficulty in difficulties" :key="difficulty">
+                                    <a class="dropdown-item difficultyDropdown"
+                                       @click="addRecipeDifficulty = difficulty">{{ difficulty }}</a>
                                 </li>
                             </ul>
                         </div>
@@ -291,7 +325,8 @@
                     <div class="mb-3 row">
                         <label for="addRecipeCookingTime" class="col-sm-12 col-form-label">Cooking Time (min)</label>
                         <div class="col-sm-12">
-                            <input type="number" placeholder="Cooking Time" class="form-control" id="addRecipeCookingTime" v-model="addRecipeCookingTime">
+                            <input type="number" placeholder="Cooking Time" class="form-control"
+                                   id="addRecipeCookingTime" v-model="addRecipeCookingTime">
                         </div>
                     </div>
                 </div>
@@ -330,15 +365,36 @@
                     <div class="mb-3 row">
                         <label for="editRecipeCategory" class="col-sm-12 col-form-label">Category</label>
                         <div class="dropdown">
-                            <button class="btn btn-primary dropdown-toggle categoryButton" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <button class="btn btn-primary dropdown-toggle categoryButton" type="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
                                 {{ editRecipeCategory ? editRecipeCategory : 'Choose Category' }}
                             </button>
                             <ul class="dropdown-menu">
                                 <li>
-                                    <a class="dropdown-item categoryDropdown" @click="editRecipeCategory = null">None</a>
+                                    <a class="dropdown-item categoryDropdown"
+                                       @click="editRecipeCategory = null">None</a>
                                 </li>
                                 <li v-for="category in categories" :key="category">
-                                    <a class="dropdown-item categoryDropdown" @click="editRecipeCategory = category">{{ category }}</a>
+                                    <a class="dropdown-item categoryDropdown"
+                                       @click="editRecipeCategory = category">{{ category }}</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="editRecipeDifficulty" class="col-sm-12 col-form-label">Difficulty</label>
+                        <div class="dropdown">
+                            <button class="btn btn-primary dropdown-toggle difficultyButton" type="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                {{ editRecipeDifficulty ? editRecipeDifficulty : 'Choose Difficulty' }}
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item difficultyDropdown" @click="editRecipeDifficulty = null">None</a>
+                                </li>
+                                <li v-for="difficulty in difficulties" :key="difficulty">
+                                    <a class="dropdown-item difficultyDropdown"
+                                       @click="editRecipeDifficulty = difficulty">{{ difficulty }}</a>
                                 </li>
                             </ul>
                         </div>
@@ -346,7 +402,8 @@
                     <div class="mb-3 row">
                         <label for="editRecipeCookingTime" class="col-sm-12 col-form-label">Cooking Time (min)</label>
                         <div class="col-sm-12">
-                            <input type="number" placeholder="Cooking Time" class="form-control" id="editRecipeCookingTime" v-model="editRecipeCookingTime">
+                            <input type="number" placeholder="Cooking Time" class="form-control"
+                                   id="editRecipeCookingTime" v-model="editRecipeCookingTime">
                         </div>
                     </div>
                 </div>
@@ -390,7 +447,9 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="deleteRecipe(recipe.id)">Confirm</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal"
+                            @click="deleteRecipe(recipe.id)">Confirm
+                    </button>
                 </div>
             </div>
         </div>
@@ -451,15 +510,18 @@
                 addRecipeTitle: null,
                 addRecipeContent: null,
                 addRecipeCategory: null,
+                addRecipeDifficulty: null,
                 addRecipeCookingTime: null,
                 editRecipeTitle: null,
                 editRecipeContent: null,
                 editRecipeCategory: null,
+                editRecipeDifficulty: null,
                 editRecipeCookingTime: null,
                 signUpUsername: null,
                 username: null,
                 usernameCard: false,
                 categories: ['Breakfast', 'Lunch', 'Dinner', 'Dessert', 'Snack', 'Drink'],
+                difficulties: ['Hard', 'Medium', 'Easy'],
             };
         },
         async mounted() {
@@ -495,6 +557,7 @@
                     this.editRecipeTitle = this.recipe.title;
                     this.editRecipeContent = this.recipe.content;
                     this.editRecipeCategory = this.recipe.category;
+                    this.editRecipeDifficulty = this.recipe.difficulty;
                     this.editRecipeCookingTime = this.recipe.cookingTime;
                 }
                 this.modalHandler = new bootstrap.Modal(document.getElementById(modalId), {
@@ -686,9 +749,10 @@
                 const title = this.addRecipeTitle;
                 const content = this.addRecipeContent;
                 const category = this.addRecipeCategory;
+                const difficulty = this.addRecipeDifficulty;
                 const cookingTime = this.addRecipeCookingTime;
 
-                this.send('POST', '/recipes', {title, content, category, cookingTime}).then((response) => {
+                this.send('POST', '/recipes', {title, content, category, difficulty, cookingTime}).then((response) => {
                     if (response.ok) {
                         this.getAndCacheRecipes();
                         this.recipes.push(response.body);
@@ -752,9 +816,16 @@
                 const title = this.editRecipeTitle;
                 const content = this.editRecipeContent;
                 const category = this.editRecipeCategory;
+                const difficulty = this.editRecipeDifficulty;
                 const cookingTime = this.editRecipeCookingTime;
 
-                this.send('PUT', '/recipes/' + recipeId, {title, content, category, cookingTime}).then((response) => {
+                this.send('PUT', '/recipes/' + recipeId, {
+                    title,
+                    content,
+                    category,
+                    difficulty,
+                    cookingTime
+                }).then((response) => {
                     if (response.ok) {
                         this.getAndCacheRecipes();
 
@@ -776,6 +847,7 @@
                         this.addRecipeTitle = null;
                         this.addRecipeContent = null;
                         this.addRecipeCategory = null;
+                        this.addRecipeDifficulty = null;
                         this.addRecipeCookingTime = null;
                         break;
                     case 'signUp':

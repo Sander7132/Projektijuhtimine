@@ -194,7 +194,7 @@ app.post('/recipes', authorizeRequest, (req, res) => {
     const maxId = recipes.reduce((max, recipe) => recipe.id > max ? recipe.id : max, 0)
 
     // Save recipe to database
-    const recipe = {id: maxId + 1, title: req.body.title, content: req.body.content, category: req.body.category, cookingTime: req.body.cookingTime, userId: req.user.id}
+    const recipe = {id: maxId + 1, title: req.body.title, content: req.body.content, category: req.body.category, difficulty: req.body.difficulty, cookingTime: req.body.cookingTime, userId: req.user.id}
 
     // Add recipe to recipes array
     recipes.push(recipe)
@@ -241,6 +241,7 @@ app.put('/recipes/:id', authorizeRequest, (req, res) => {
     recipe.title = req.body.title
     recipe.content = req.body.content
     recipe.category = req.body.category
+    recipe.difficulty = req.body.difficulty
     recipe.cookingTime = req.body.cookingTime
 
     // Send update event to clients
