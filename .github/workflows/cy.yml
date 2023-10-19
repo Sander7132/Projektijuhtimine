@@ -21,8 +21,9 @@ jobs:
           name: cypress-screenshots
           path: cypress/screenshots
           if-no-files-found: ignore # 'warn' or 'error' are also available, defaults to `warn`
-      - uses: actions/upload-artifact@v3
-         # add the line below to store videos only on failures
+      - uses:
+          actions/upload-artifact@v3
+          # add the line below to store videos only on failures
         if: failure()
         with:
           name: cypress-videos

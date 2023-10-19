@@ -143,8 +143,7 @@ paths:
                   value: Invalid session
           description: Unauthorized
       security:
-        -
-          Bearer: []
+        - Bearer: []
       summary: Destroy a Session
       description: 'Destroys a `Session`, signing the user out. Reads the session ID from Authorization header.'
   /recipes:
@@ -166,8 +165,7 @@ paths:
               examples:
                 Recipe:
                   value:
-                    -
-                      id: 3
+                    - id: 3
                       title: Title
                       content: Content
                       category: Dinner
@@ -193,8 +191,7 @@ paths:
           description: Unauthorized
       deprecated: false
       security:
-        -
-          Bearer: []
+        - Bearer: []
       operationId: getRecipes
       summary: List All Recipes
       description: Gets a list of all `Recipes` entities.
@@ -251,8 +248,7 @@ paths:
           description: Unauthorized
       deprecated: false
       security:
-        -
-          Bearer: []
+        - Bearer: []
       operationId: createRecipe
       summary: Create a Recipe
       description: Creates a new instance of a `Recipe`.
@@ -279,8 +275,7 @@ paths:
                   value: Invalid session
           description: Unauthorized
       security:
-        -
-          Bearer: []
+        - Bearer: []
       operationId: deleteAllRecipes
       summary: Deletes All Recipes
       description: Deletes all instances of a `Recipe`.
@@ -308,8 +303,7 @@ paths:
       tags:
         - '/recipes/:id'
       parameters:
-        -
-          name: id
+        - name: id
           description: A recipe to be edited
           schema:
             type: integer
@@ -359,8 +353,7 @@ paths:
           description: Recipe ID not found.
       deprecated: false
       security:
-        -
-          Bearer: []
+        - Bearer: []
       operationId: editRecipe
       summary: Edit Recipe
       description: Updates an instance of `Recipe`.
@@ -368,8 +361,7 @@ paths:
       tags:
         - '/recipes/:id'
       parameters:
-        -
-          name: id
+        - name: id
           description: A recipe to be deleted
           schema:
             type: integer
@@ -405,14 +397,12 @@ paths:
           description: Recipe ID not found in database.
       deprecated: false
       security:
-        -
-          Bearer: []
+        - Bearer: []
       operationId: deleteRecipe
       summary: Delete Recipe
       description: Deletes an instance of a `Recipe`.
     parameters:
-      -
-        name: id
+      - name: id
         in: path
         required: true
 components:
@@ -480,12 +470,12 @@ components:
           format: int32
           type: integer
         category:
-            type: string
+          type: string
         difficulty:
-            type: string
+          type: string
         cookingTime:
-            format: int32
-            type: integer
+          format: int32
+          type: integer
       example:
         content: This is the content of example recipe 1
         category: Dinner
@@ -499,15 +489,11 @@ components:
       scheme: bearer
       type: http
 tags:
-  -
-    name: /users
+  - name: /users
     description: ''
-  -
-    name: /sessions
+  - name: /sessions
     description: ''
-  -
-    name: /recipes
+  - name: /recipes
     description: ''
-  -
-    name: '/recipes/:id'
+  - name: '/recipes/:id'
     description: ''
