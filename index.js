@@ -171,7 +171,7 @@ function authorizeRequest(req, res, next) {
 }
 
 app.get('/recipes', authorizeRequest, async (req, res) => {
-  await delay(1000);
+  await delay(300);
 
   // Get recipes for user
   const recipesForUser = recipes.filter((recipe) => recipe.userId === req.user.id);

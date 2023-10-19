@@ -19,6 +19,7 @@
     <link rel="manifest" href="/icons/site.webmanifest" />
     <style>
       body {
+        background-color: #a9a9a9;
         padding-bottom: 50px;
       }
 
@@ -40,15 +41,16 @@
         border-radius: 0.25rem;
         padding: 1rem;
         max-width: 340px;
-        max-height: 200px;
+        max-height: 400px;
+        display: flex;
+        flex-direction: column;
         overflow: hidden;
         word-wrap: break-word;
       }
 
       .recipe-card button {
-        width: 125px;
-        margin-right: 15px;
-        margin-left: 5px;
+        width: 72px;
+        margin-right: 5px;
       }
 
       .recipe-card:hover {
@@ -56,8 +58,12 @@
       }
 
       .recipe-buttons-row {
-        margin-top: 1px;
-        margin-left: 0;
+        align-self: flex-start;
+        display: flex;
+        gap: 5px;
+        margin-left: inherit;
+        margin-top: auto;
+        padding-top: 10px;
       }
 
       .name-card {
@@ -81,16 +87,11 @@
       }
 
       .recipe-details-row {
-        margin-top: 5px;
-        margin-left: 0;
+        /*margin-top: 5px;*/
+        margin-left: inherit;
       }
 
-      .categoryDropdown {
-        cursor: pointer;
-        user-select: none;
-      }
-
-      .difficultyDropdown {
+      .detailsDropdown {
         cursor: pointer;
         user-select: none;
       }
@@ -108,10 +109,12 @@
       .recipe-content-row {
         margin-top: 5px;
         margin-left: 0;
+        max-height: 150px;
+        overflow: hidden;
       }
 
       .recipe-content {
-        padding: 0;
+        padding: inherit;
       }
 
       [v-cloak] {
@@ -145,12 +148,6 @@
           <!-- List of recipes -->
           <div id="recipe-list">
             <div v-for="recipe in recipes" class="recipe-card">
-              <div class="row recipe-buttons-row">
-                <button type="button" class="btn btn-danger border border-dark col" data-bs-toggle="modal" v-if="sessionId" @click="showModal('deleteARecipeModal', recipe.id)">
-                  Delete
-                </button>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" @click="showModal('editRecipeModal', recipe.id)">Edit</button>
-              </div>
               <div class="row recipe-details-row">
                 <div class="recipe-details" v-if="recipe.category">{{ recipe.category }}</div>
                 <div class="recipe-details" v-if="recipe.difficulty">{{ recipe.difficulty}}</div>
@@ -161,6 +158,10 @@
               </div>
               <div class="row recipe-content-row">
                 <p class="recipe-content">{{ recipe.content }}</p>
+              </div>
+              <div class="row recipe-buttons-row">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" v-if="sessionId" @click="showModal('deleteARecipeModal', recipe.id)">Delete</button>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" @click="showModal('editRecipeModal', recipe.id)">Edit</button>
               </div>
             </div>
           </div>
@@ -259,10 +260,10 @@
                   </button>
                   <ul class="dropdown-menu">
                     <li>
-                      <a class="dropdown-item categoryDropdown" @click="addRecipeCategory = null">None</a>
+                      <a class="dropdown-item detailsDropdown" @click="addRecipeCategory = null">None</a>
                     </li>
                     <li v-for="category in categories" :key="category">
-                      <a class="dropdown-item categoryDropdown" @click="addRecipeCategory = category">{{ category }}</a>
+                      <a class="dropdown-item detailsDropdown" @click="addRecipeCategory = category">{{ category }}</a>
                     </li>
                   </ul>
                 </div>
@@ -275,10 +276,10 @@
                   </button>
                   <ul class="dropdown-menu">
                     <li>
-                      <a class="dropdown-item difficultyDropdown" @click="addRecipeDifficulty = null">None</a>
+                      <a class="dropdown-item detailsDropdown" @click="addRecipeDifficulty = null">None</a>
                     </li>
                     <li v-for="difficulty in difficulties" :key="difficulty">
-                      <a class="dropdown-item difficultyDropdown" @click="addRecipeDifficulty = difficulty">{{ difficulty }}</a>
+                      <a class="dropdown-item detailsDropdown" @click="addRecipeDifficulty = difficulty">{{ difficulty }}</a>
                     </li>
                   </ul>
                 </div>
@@ -326,10 +327,10 @@
                   </button>
                   <ul class="dropdown-menu">
                     <li>
-                      <a class="dropdown-item categoryDropdown" @click="editRecipeCategory = null">None</a>
+                      <a class="dropdown-item detailsDropdown" @click="editRecipeCategory = null">None</a>
                     </li>
                     <li v-for="category in categories" :key="category">
-                      <a class="dropdown-item categoryDropdown" @click="editRecipeCategory = category">{{ category }}</a>
+                      <a class="dropdown-item detailsDropdown" @click="editRecipeCategory = category">{{ category }}</a>
                     </li>
                   </ul>
                 </div>
@@ -342,10 +343,10 @@
                   </button>
                   <ul class="dropdown-menu">
                     <li>
-                      <a class="dropdown-item difficultyDropdown" @click="editRecipeDifficulty = null">None</a>
+                      <a class="dropdown-item detailsDropdown" @click="editRecipeDifficulty = null">None</a>
                     </li>
                     <li v-for="difficulty in difficulties" :key="difficulty">
-                      <a class="dropdown-item difficultyDropdown" @click="editRecipeDifficulty = difficulty">{{ difficulty }}</a>
+                      <a class="dropdown-item detailsDropdown" @click="editRecipeDifficulty = difficulty">{{ difficulty }}</a>
                     </li>
                   </ul>
                 </div>
@@ -637,7 +638,6 @@
               // Get recipes from local storage
               this.getRecipesFromLocalStorage();
               await this.getAndCacheRecipes();
-              alert('Recipes updated.');
             }
             if (response.body === 'User not found') {
               this.signInEmail = null;
