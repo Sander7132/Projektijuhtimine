@@ -68,12 +68,13 @@
 
       .name-card {
         border-radius: 0.375rem;
-        position: absolute;
-        top: 0;
-        left: 0;
+        border: 1px solid black;
+        /*position: absolute;*/
+        /*top: 0;*/
+        /*left: 0;*/
         padding: 6px 12px;
-        margin-left: 5px;
-        margin-top: 5px;
+        /*margin-left: 5px;*/
+        /*margin-top: 5px;*/
         background-color: #0d6efd;
         color: #fff;
       }
@@ -120,31 +121,63 @@
       [v-cloak] {
         display: none;
       }
+
+      .test123 {
+        width: 50px;
+      }
     </style>
   </head>
   <body>
     <div id="app" v-cloak>
-      <!-- Page content-->
+      <!--  Header  -->
+      <div class="container-fluid sticky-top">
+        <div class="row">
+          <nav class="navbar bg-primary px-3 rounded-bottom">
+            <div class="col d-flex justify-content center align-items-center">
+              <a class="navbar-brand" href="#">
+                <img src="/img/logo.png" alt="Logo" width="50" height="50" class="d-inline-block align-text-top" />
+              </a>
+              <h1>RecipeBook</h1>
+            </div>
+
+            <div class="col d-flex justify-content-end">
+              <div class="d-flex justify-content-end">
+                <div v-if="usernameCard" class="name-card">{{ username }}</div>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" v-if="!sessionId" @click="showModal('signUpModal')">Sign Up</button>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" v-if="!sessionId" @click="showModal('signInModal')">Sign In</button>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" v-if="sessionId" @click="signOut">Sign Out</button>
+              </div>
+            </div>
+          </nav>
+        </div>
+
+        <div class="row mt-2 mx-1 d-flex flex-column">
+          <button type="button" class="btn btn-primary mb-2 test123" data-bs-toggle="modal" v-if="sessionId" @click="showModal('addRecipeModal')">+</button>
+          <button type="button" class="btn btn-danger border border-dark test123" data-bs-toggle="modal" v-if="sessionId" @click="showModal('deleteRecipeModal')">X</button>
+        </div>
+      </div>
+
+      <!-- Page content -->
       <div class="container">
-        <div v-if="usernameCard" class="name-card">{{ username }}</div>
-        <div class="mt-5">
-          <h1 class="text-center">Recipe Book</h1>
-          <p class="lead text-center">This is a simple RecipeBook app</p>
-          <div class="row">
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" v-if="!sessionId" @click="showModal('signUpModal')">Sign Up</button>
-            &nbsp;
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" v-if="!sessionId" @click="showModal('signInModal')">Sign In</button>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" v-if="sessionId" @click="signOut">Sign Out</button>
-            &nbsp;
-          </div>
-          <div class="row">
-            <button type="button" class="btn btn-primary col" data-bs-toggle="modal" v-if="sessionId" @click="showModal('addRecipeModal')">Add Recipe</button>
-            &nbsp;
-            <button type="button" class="btn btn-danger border border-dark col" data-bs-toggle="modal" v-if="sessionId" @click="showModal('deleteRecipeModal')">
-              Delete All Recipes
-            </button>
-          </div>
-          &nbsp;
+        <!--                <div v-if="usernameCard" class="name-card">{{ username }}</div>-->
+        <div class="mt-2">
+          <!--          <h1 class="text-center">Recipe Book</h1>-->
+          <!--          <p class="lead text-center">This is a simple RecipeBook app</p>-->
+          <!--          <div class="row">-->
+          <!--            <button type="button" class="btn btn-primary" data-bs-toggle="modal" v-if="!sessionId" @click="showModal('signUpModal')">Sign Up</button>-->
+          <!--            &nbsp;-->
+          <!--            <button type="button" class="btn btn-primary" data-bs-toggle="modal" v-if="!sessionId" @click="showModal('signInModal')">Sign In</button>-->
+          <!--            <button type="button" class="btn btn-primary" data-bs-toggle="modal" v-if="sessionId" @click="signOut">Sign Out</button>-->
+          <!--            &nbsp;-->
+          <!--          </div>-->
+          <!--          <div class="row">-->
+          <!--            <button type="button" class="btn btn-primary col" data-bs-toggle="modal" v-if="sessionId" @click="showModal('addRecipeModal')">Add Recipe</button>-->
+          <!--            &nbsp;-->
+          <!--            <button type="button" class="btn btn-danger border border-dark col" data-bs-toggle="modal" v-if="sessionId" @click="showModal('deleteRecipeModal')">-->
+          <!--              Delete All Recipes-->
+          <!--            </button>-->
+          <!--          </div>-->
+          <!--          &nbsp;-->
           <!-- List of recipes -->
           <div id="recipe-list">
             <div v-for="recipe in recipes" class="recipe-card">
