@@ -755,7 +755,9 @@
             }
 
             // Validate that cooking time is not negative, zero or greater than 1440
-            if (this.editRecipeCookingTime !== null && (this.editRecipeCookingTime <= 0 || this.editRecipeCookingTime > 1440)) {
+            if (this.editRecipeCookingTime === '') {
+              this.editRecipeCookingTime = null;
+            } else if (this.editRecipeCookingTime !== null && (this.editRecipeCookingTime <= 0 || this.editRecipeCookingTime > 1440)) {
               alert('Cooking time cannot be negative, zero, or greater than 1440');
               return;
             }

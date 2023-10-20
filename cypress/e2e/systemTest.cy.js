@@ -34,7 +34,7 @@ describe('Creating a user to be able to add books', () => {
     cy.wait(1500);
     cy.get('.recipe-card').should('contain', 'New Recipe');
     cy.wait(1500);
-    cy.get('#recipe-list > div:nth-child(2) > div > button.btn.btn-primary').click({ force: true });
+    cy.get(':nth-child(2) > .recipe-buttons-row > :nth-child(2)').click({ force: true });
     cy.get('#editRecipeTitle').type('2');
     cy.wait(1000);
     cy.get('#editRecipeContent').type('2');
