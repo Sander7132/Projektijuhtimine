@@ -241,19 +241,19 @@
             </div>
             <div class="modal-body">
               <div class="mb-3 row">
-                <label for="addRecipeTitle" class="col-sm-12 col-form-label">Title</label>
+                <label for="addRecipeTitle" class="col-sm-12 col-form-label"><b>Title</b></label>
                 <div class="col-sm-12">
                   <input placeholder="Recipe Name (e.g., Spaghetti Bolognese)" class="form-control" id="addRecipeTitle" v-model="addRecipeTitle" />
                 </div>
               </div>
               <div class="mb-3 row">
-                <label for="addRecipeContent" class="col-sm-12 col-form-label">Content</label>
+                <label for="addRecipeContent" class="col-sm-12 col-form-label"><b>Content</b></label>
                 <div class="col-sm-12">
                   <textarea placeholder="Include Key Ingredients and Preparation" class="form-control" id="addRecipeContent" v-model="addRecipeContent"></textarea>
                 </div>
               </div>
               <div class="mb-3 row">
-                <label for="addRecipeCategory" class="col-sm-12 col-form-label">Category</label>
+                <label for="addRecipeCategory" class="col-sm-12 col-form-label"><b>Category</b></label>
                 <div class="dropdown">
                   <button class="btn btn-primary dropdown-toggle categoryButton" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                     {{ addRecipeCategory ? addRecipeCategory : 'Choose Category' }}
@@ -269,7 +269,7 @@
                 </div>
               </div>
               <div class="mb-3 row">
-                <label for="addRecipeDifficulty" class="col-sm-12 col-form-label">Difficulty</label>
+                <label for="addRecipeDifficulty" class="col-sm-12 col-form-label"><b>Difficulty</b></label>
                 <div class="dropdown">
                   <button class="btn btn-primary dropdown-toggle difficultyButton" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                     {{ addRecipeDifficulty ? addRecipeDifficulty : 'Choose Difficulty' }}
@@ -285,7 +285,7 @@
                 </div>
               </div>
               <div class="mb-3 row">
-                <label for="addRecipeCookingTime" class="col-sm-12 col-form-label">Cooking Time (min)</label>
+                <label for="addRecipeCookingTime" class="col-sm-12 col-form-label"><b>Cooking Time (min)</b></label>
                 <div class="col-sm-12">
                   <input type="number" placeholder="Cooking Time" class="form-control" id="addRecipeCookingTime" v-model="addRecipeCookingTime" />
                 </div>
