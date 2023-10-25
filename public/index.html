@@ -320,7 +320,7 @@
                 </div>
               </div>
               <div class="mb-3 row">
-                <label for="editRecipeCategory" class="col-sm-12 col-form-label">Category</label>
+                <label for="editRecipeCategory" class="col-sm-12 col-form-label"><b>Category</b></label>
                 <div class="dropdown">
                   <button class="btn btn-primary dropdown-toggle categoryButton" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                     {{ editRecipeCategory ? editRecipeCategory : 'Choose Category' }}
@@ -336,7 +336,9 @@
                 </div>
               </div>
               <div class="mb-3 row">
-                <label for="editRecipeDifficulty" class="col-sm-12 col-form-label">Difficulty</label>
+                <label for="editRecipeDifficulty" class="col-sm-12 col-form-label">
+                  <b>Difficulty</b>
+                </label>
                 <div class="dropdown">
                   <button class="btn btn-primary dropdown-toggle difficultyButton" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                     {{ editRecipeDifficulty ? editRecipeDifficulty : 'Choose Difficulty' }}
@@ -352,7 +354,7 @@
                 </div>
               </div>
               <div class="mb-3 row">
-                <label for="editRecipeCookingTime" class="col-sm-12 col-form-label">Cooking Time (min)</label>
+                <label for="editRecipeCookingTime" class="col-sm-12 col-form-label"><b>Cooking Time (min)</b></label>
                 <div class="col-sm-12">
                   <input type="number" placeholder="Cooking Time" class="form-control" id="editRecipeCookingTime" v-model="editRecipeCookingTime" />
                 </div>
