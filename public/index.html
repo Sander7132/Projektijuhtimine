@@ -37,7 +37,7 @@
 
       .recipe-card {
         background-color: #f8f9fa;
-        border: 3px solid #228B22;
+        border: 3px solid #228b22;
         border-radius: 0.25rem;
         padding: 1rem;
         max-width: 340px;
@@ -76,6 +76,8 @@
         margin-top: 5px;
         background-color: #0d6efd;
         color: #fff;
+        cursor: pointer;
+        user-select: none;
       }
 
       .recipe-details {
@@ -126,7 +128,7 @@
     <div id="app" v-cloak>
       <!-- Page content-->
       <div class="container">
-        <div v-if="usernameCard" class="name-card">{{ username }}</div>
+        <div v-if="username" @click="showModal('userInformationModal')" class="name-card">{{ username }}</div>
         <div class="mt-5">
           <h1 class="text-center">Recipe Book</h1>
           <p class="lead text-center">This is a simple RecipeBook app</p>
@@ -439,6 +441,40 @@
           </div>
         </div>
       </div>
+      <!--  Profile Information Modal  -->
+      <div class="modal fade" id="userInformationModal" tabindex="-1" aria-labelledby="userInformationModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="userInformationModalLabel">Profile</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3 row">
+                <strong><label for="userId" class="col-sm-12 col-form-label">Id:</label></strong>
+                <div class="col-sm-12">
+                  <div>{{ userId }}</div>
+                </div>
+              </div>
+              <div class="mb-3 row">
+                <strong><label for="userUsername" class="col-sm-12 col-form-label">Username:</label></strong>
+                <div class="col-sm-12">
+                  <div>{{ username }}</div>
+                </div>
+              </div>
+              <div class="mb-3 row">
+                <strong><label for="userEmail" class="col-sm-12 col-form-label">Email:</label></strong>
+                <div class="col-sm-12">
+                  <div>{{ email }}</div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script>
@@ -474,7 +510,8 @@
             editRecipeCookingTime: null,
             signUpUsername: null,
             username: null,
-            usernameCard: false,
+            email: null,
+            userId: null,
             categories: ['Breakfast', 'Lunch', 'Dinner', 'Dessert', 'Snack', 'Drink'],
             difficulties: ['Hard', 'Medium', 'Easy'],
           };
@@ -487,9 +524,7 @@
             // For recipes
             this.getRecipesFromLocalStorage();
             await this.getAndCacheRecipes();
-            // For username
-            this.username = localStorage.getItem('username');
-            this.usernameCard = true;
+            await this.getUserInformation();
           }
         },
         methods: {
@@ -622,13 +657,10 @@
             if (response.ok) {
               // Store the token in localStorage
               localStorage.setItem('sessionId', response.body.id);
-              // Store the username in localStorage
-              localStorage.setItem('username', response.body.username);
               // Sign in the user
               this.sessionId = response.body.id;
-              // Show the username card
-              this.username = response.body.username;
-              this.usernameCard = true;
+              // Get user information
+              await this.getUserInformation();
               // Clear the input fields
               this.clearInputFields('signIn');
               // Close the modal
@@ -654,18 +686,16 @@
             // Send DELETE /sessions
             const response = await this.send('DELETE', '/sessions');
             if (response.ok) {
-              this.usernameCard = false;
               this.showModal('signOutModal');
               this.clearStorageAndResetSessionInfo();
             }
           },
 
           clearStorageAndResetSessionInfo: function () {
-            localStorage.removeItem('username');
             localStorage.removeItem('sessionId');
             this.sessionId = null;
             this.recipes = null;
-            this.usernameCard = false;
+            this.username = null;
           },
           addRecipe: function () {
             // Validate the form
@@ -813,6 +843,15 @@
                 break;
               default:
                 break;
+            }
+          },
+          getUserInformation: async function () {
+            // Send GET /users
+            const response = await this.send('GET', '/users');
+            if (response.ok) {
+              this.email = response.body.email;
+              this.username = response.body.username;
+              this.userId = response.body.id;
             }
           },
         },

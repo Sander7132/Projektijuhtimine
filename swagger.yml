@@ -58,6 +58,46 @@ paths:
       operationId: createUser
       summary: Create a User
       description: Creates a new instance of a `User`.
+    get:
+      tags:
+        - /users
+      responses:
+        '200':
+          content:
+            text/html:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+              examples:
+                User:
+                  value:
+                    - id: 1
+                      email: example@gmail.com
+                      username: Example Username
+          description: Successful response - returns an array of `Users` entities.
+        '400':
+          content:
+            text/html:
+              examples:
+                Invalid authorization header:
+                  value: Invalid authorization header
+          description: Bad Request
+        '401':
+          content:
+            text/html:
+              examples:
+                Missing authorization header:
+                  value: Missing authorization header
+                Invalid session:
+                  value: Invalid session
+          description: Unauthorized
+      deprecated: false
+      security:
+        - Bearer: [ ]
+      operationId: getUserInformation
+      summary: List Specific User
+      description: Gets a list of specific `Users` entities.
   /sessions:
     summary: Path used to manage the list of sessions.
     description: >-

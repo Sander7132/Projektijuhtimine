@@ -112,6 +112,17 @@ app.post('/users', async (req, res) => {
   res.status(201).end();
 });
 
+app.get('/users', authorizeRequest, (req, res) => {
+  // Get requesters id
+  const requesterId = req.user.id;
+
+  // Get specific user
+  const user = users.find((user) => user.id === requesterId);
+
+  // Send user to client without sending password
+  res.send({ id: user.id, email: user.email, username: user.username });
+});
+
 // POST /sessions
 app.post('/sessions', async (req, res) => {
   // Validate email and password
