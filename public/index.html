@@ -19,7 +19,7 @@
     <link rel="manifest" href="/icons/site.webmanifest" />
     <style>
       body {
-        background: linear-gradient(to right, #00AAFF, #00FF6C);
+        background: linear-gradient(to right, #00aaff, #00ff6c);
         padding-bottom: 50px;
       }
 
@@ -194,6 +194,12 @@
                 <label for="signUpPassword"><b>Password</b></label>
                 <div class="col-sm-10">
                   <input type="password" placeholder="Secure password (letters, numbers, symbols)" class="form-control" id="signUpPassword" v-model="signUpPassword" />
+                </div>
+              </div>
+              <div class="mb-3 row">
+                <label for="confirmSignUpPassword" class="col-sm-12 col-form-label"><b>Confirm Password</b></label>
+                <div class="col-sm-12">
+                  <input type="password" class="form-control" id="confirmSignUpPassword" placeholder="Confirm Password" v-model="confirmSignUpPassword" />
                 </div>
               </div>
             </div>
@@ -492,8 +498,10 @@
         data() {
           return {
             modalHandler: null,
+            signUpUsername: null,
             signUpEmail: null,
             signUpPassword: null,
+            confirmSignUpPassword: null,
             signInEmail: null,
             signInPassword: null,
             sessionId: null,
@@ -508,7 +516,6 @@
             editRecipeCategory: null,
             editRecipeDifficulty: null,
             editRecipeCookingTime: null,
-            signUpUsername: null,
             username: null,
             email: null,
             userId: null,
@@ -601,6 +608,7 @@
             const username = this.signUpUsername ? this.signUpUsername.trim() : null;
             const email = this.signUpEmail ? this.signUpEmail.trim() : null;
             const password = this.signUpPassword ? this.signUpPassword.trim() : null;
+            const confirmSignUpPassword = this.confirmSignUpPassword ? this.confirmSignUpPassword.trim() : null;
             if (!username || !email || !password) {
               // One or all fields are empty or contain only whitespace
               alert('Please enter a valid username, email and password');
@@ -616,6 +624,13 @@
               }
               return;
             }
+
+            if (!confirmSignUpPassword || password !== confirmSignUpPassword) {
+              alert('Please confirm your password');
+              this.confirmSignUpPassword = null;
+              return;
+            }
+
             // Send POST /users
             const response = await this.send('POST', '/users', { username, email, password });
             if (response.ok) {
@@ -634,6 +649,7 @@
             }
             if (response.body === 'Password must be at least 8 characters long') {
               this.signUpPassword = null;
+              this.confirmSignUpPassword = null;
               return;
             }
           },
@@ -836,6 +852,7 @@
                 this.signUpUsername = null;
                 this.signUpEmail = null;
                 this.signUpPassword = null;
+                this.confirmSignUpPassword = null;
                 break;
               case 'signIn':
                 this.signInEmail = null;

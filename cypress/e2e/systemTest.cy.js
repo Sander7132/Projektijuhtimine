@@ -11,6 +11,8 @@ describe('Creating a user to be able to add books', () => {
     cy.wait(1000);
     cy.get('#signUpPassword').type('Passw0rd');
     cy.wait(1000);
+    cy.get('#confirmSignUpPassword').type('Passw0rd');
+    cy.wait(1000);
     cy.get('#signUpModal > .modal-dialog > .modal-content > .modal-footer > .btn-primary').click({ force: true });
     cy.wait(1000);
   });
